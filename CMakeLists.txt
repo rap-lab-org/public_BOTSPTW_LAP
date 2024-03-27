@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(emoa)
+project(motsptw)
 
 # find_package(Boost REQUIRED)
 
