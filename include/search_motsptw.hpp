@@ -38,7 +38,7 @@ class Frontier {
 public:
   Frontier();
   virtual ~Frontier();
-  virtual bool Check(Label l);
+  virtual bool Check(const Label& l) const;
   virtual void Update(Label l);
   std::vector<Label> labels;
 };
@@ -61,11 +61,11 @@ protected:
 
     virtual long _GenLabelId() ; //
 
-    virtual bool _FrontierCheck(Label l) ; //
+    virtual bool _FrontierCheck(const Label& l) const; //
   
-    virtual bool _SolutionCheck(Label l) ; //
+    virtual bool _SolutionCheck(const Label& l) const; //
 
-    virtual bool _FeaCheck(Label l) ; //
+    virtual bool _FeaCheck(const Label& l) const; //
 
     virtual void _PostProcRes(); //
 
@@ -73,7 +73,7 @@ protected:
 
     virtual void _InitFrontiers() ; //
 
-    virtual bool _IsDone(Label l) ; //
+    virtual bool _IsDone(const Label& l) const; //
 
     basic::PlannerGraph* _graph;
     std::vector< Frontier* > _alpha;

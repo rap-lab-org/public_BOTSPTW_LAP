@@ -24,7 +24,7 @@ Frontier::~Frontier() {
 }
 
 
-bool Frontier::Check(Label l) {
+bool Frontier::Check(const Label& l) const {
   if (labels.empty()) {
     return false;
   }
@@ -135,17 +135,17 @@ long MOTSPTW::_GenLabelId() {
   return out;
 };
 
-bool MOTSPTW::_FrontierCheck(Label l) {
+bool MOTSPTW::_FrontierCheck(const Label& l) const {
   auto res = _alpha[l.v]->Check(l);
   return res;
 };
 
-bool MOTSPTW::_SolutionCheck(Label l) {
+bool MOTSPTW::_SolutionCheck(const Label& l) const {
   auto temp = solu->Check(l);
   return temp;
 };
 
-bool MOTSPTW::_FeaCheck(Label l) {
+bool MOTSPTW::_FeaCheck(const Label& l) const {
   if (l.g[1] + _service_time[l.v] > _tw[l.v].second) {
     return true;
   }
@@ -189,7 +189,7 @@ void MOTSPTW::_InitFrontiers() {
   return;
 };
 
-bool MOTSPTW::_IsDone(Label l) {
+bool MOTSPTW::_IsDone(const Label& l) const {
   for (auto it : l.b) {
     if (!it) {
       return false;
