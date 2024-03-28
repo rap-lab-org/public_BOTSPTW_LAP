@@ -58,7 +58,7 @@ void Frontier::Update(Label l) {
       }
     }
     if (flag == 0) {
-      labels.erase(it);
+      it = labels.erase(it);
     }
   }
   labels.push_back(l);
