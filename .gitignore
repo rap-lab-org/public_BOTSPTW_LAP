@@ -33,3 +33,10 @@ build/
 *.exe
 *.out
 *.app
+
+## VS Code ##
+.vscode/*
+
+## Build directory ##
+
+build/
