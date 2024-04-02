@@ -1,5 +1,4 @@
 #include "search_motsptw.hpp"
-#include "graph_io.hpp"
 #include <iostream>
 #include <string>
 
