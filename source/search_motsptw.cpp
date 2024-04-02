@@ -47,8 +47,9 @@ void Frontier::Update(Label l) {
     return;
   }
   int flag = 0;
-  for (auto it = labels.begin(); it != labels.end(); it++) {
+  for (auto it = labels.begin(); it != labels.end(); ) {
     if (it->g[0] < l.g[0] || it->g[1] < l.g[1]) {
+      it++;
       continue;
     }
     for (int i = 0; i < l.b.size(); i++) {
@@ -59,6 +60,9 @@ void Frontier::Update(Label l) {
     }
     if (flag == 0) {
       it = labels.erase(it);
+    }
+    else {
+      it++;
     }
   }
   labels.push_back(l);
