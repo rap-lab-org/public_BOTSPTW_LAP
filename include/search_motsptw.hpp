@@ -67,6 +67,8 @@ protected:
 
     virtual bool _FeaCheck(const Label& l) const; //
 
+    virtual bool _PostCheck(const Label& l) const;
+
     virtual void _PostProcRes(); //
 
     virtual std::vector<long> _BuildPath(long lid) ; //

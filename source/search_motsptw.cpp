@@ -37,8 +37,10 @@ bool Frontier::Check(const Label& l) const {
         return false;
       }
     }
+    std::cout << "here" << std::endl;
+    return true;
   }
-  return true;
+  return false;
 }
 
 void Frontier::Update(Label l) {
@@ -159,6 +161,16 @@ bool MOTSPTW::_FeaCheck(const Label& l) const {
   return false;
 };
 
+bool MOTSPTW::_PostCheck(const Label& l) const {
+  for (int i = 0; i < l.b.size(); i++) {
+    // For all nodes that have not been visited, check if the time window is violated.
+    if (l.g[1] + _graph->GetCost(l.v, i)[1] + _service_time[i] > _tw[i].second) {
+      return true;
+    }
+  }
+  return false;
+};
+
 std::vector<long> MOTSPTW::_BuildPath(long lid) {
   std::vector<long> out, out2;
   while( lid >= 0 ) {
@@ -218,7 +230,8 @@ int MOTSPTW::Search(long vo, long vd) {
         Label l = *_open.begin();
         _open.erase(_open.begin());
         if ( _FrontierCheck(l) || _SolutionCheck(l) ) {
-            continue;
+          // std::cout << "l: " << l << std::endl;
+          continue;
         }
         _UpdateFrontier(l);
         if (l.v == vd) {
@@ -239,12 +252,23 @@ int MOTSPTW::Search(long vo, long vd) {
             Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u), bu);
             _label[l2.id] = l2;
             _parent[l2.id] = l.id;
-            if (_FrontierCheck(l2) || _SolutionCheck(l2) || _FeaCheck(l2))
+            if (_FrontierCheck(l2) || _SolutionCheck(l2))
             {
+              // std::cout << "l2: " << l2 << std::endl;
+              continue;
+            }
+            if (_FeaCheck(l2))
+            {
+              // std::cout << "l2: " << l2 << std::endl;
+              continue;
+            }
+            if (_PostCheck(l2)) {
+              // std::cout << "l2: " << l2 << std::endl;
               continue;
             }
             _open.push_back(l2);
           }
+          // std::cout << "size of open: " << _open.size() << std::endl;
         }     
     }
     _PostProcRes();
