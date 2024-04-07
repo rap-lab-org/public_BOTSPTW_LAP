@@ -163,6 +163,9 @@ bool MOTSPTW::_FeaCheck(const Label& l) const {
 
 bool MOTSPTW::_PostCheck(const Label& l) const {
   for (int i = 0; i < l.b.size(); i++) {
+    if (l.b[i] == true || i == l.v) {
+      continue;
+    }
     // For all nodes that have not been visited, check if the time window is violated.
     if (l.g[1] + _graph->GetCost(l.v, i)[1] + _service_time[i] > _tw[i].second) {
       return true;
@@ -268,7 +271,7 @@ int MOTSPTW::Search(long vo, long vd) {
             }
             _open.push_back(l2);
           }
-          // std::cout << "size of open: " << _open.size() << std::endl;
+          std::cout << "size of open: " << _open.size() << std::endl;
         }     
     }
     _PostProcRes();
