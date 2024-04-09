@@ -28,16 +28,21 @@ bool Frontier::Check(const Label& l) const {
   if (labels.empty()) {
     return false;
   }
+  int flag = 0;
   for (auto it = labels.begin(); it != labels.end(); it++) {
+    flag = 0;
     if (it->g[0] > l.g[0] || it->g[1] > l.g[1]) {
-      return false;
+      continue;
     }
     for (int i = 0; i < l.b.size(); i++) {
       if (l.b[i] && !it->b[i]) {
-        return false;
+        flag = 1;
+        break;
       }
     }
-    std::cout << "here" << std::endl;
+    if (flag == 1) {
+      continue;
+    }
     return true;
   }
   return false;
@@ -271,7 +276,7 @@ int MOTSPTW::Search(long vo, long vd) {
             }
             _open.push_back(l2);
           }
-          std::cout << "size of open: " << _open.size() << std::endl;
+          // std::cout << "size of open: " << _open.size() << std::endl;
         }     
     }
     _PostProcRes();
