@@ -214,8 +214,8 @@ void MOTSPTW::_InitFrontiers() {
 };
 
 bool MOTSPTW::_IsDone(const Label& l) const {
-  for (auto it : l.b) {
-    if (!it) {
+  for (int i = 0; i < l.b.size(); i++) {
+    if (l.b[i] == false && i != l.v) {
       return false;
     }
   }
@@ -242,11 +242,9 @@ int MOTSPTW::Search(long vo, long vd) {
           continue;
         }
         _UpdateFrontier(l);
-        if (l.v == vd) {
-            l.b[vd] = true;
-            if (_IsDone(l)) {
-              solu->Update(l);
-            }
+        if (_IsDone(l)) {
+            l.b[l.v] = true;
+            solu->Update(l);
         } else {
           auto succs = _graph->GetSuccs(l.v);
           auto cvecs = _graph->GetSuccCosts(l.v);
