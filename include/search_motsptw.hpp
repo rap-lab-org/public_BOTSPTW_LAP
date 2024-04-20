@@ -30,6 +30,7 @@ struct Label {
 struct MOTSPTWResult {
   std::unordered_map< long, std::vector<long> > paths;
   std::unordered_map< long, CostVec > costs;
+  long num_generated_labels;
 };
 
 std::ostream& operator<<(std::ostream& os, Label& l) ;
@@ -67,7 +68,9 @@ protected:
 
     virtual bool _FeaCheck(const Label& l) const; //
 
-    virtual bool _PostCheck(const Label& l) const;
+    virtual bool _PostCheck_1(const Label& l) const;
+
+    virtual bool _PostCheck_2(const Label& l) const;
 
     virtual void _PostProcRes(); //
 

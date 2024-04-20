@@ -2,6 +2,7 @@
 #include <set>
 #include <memory>
 #include <fstream>
+#include <algorithm>
 
 namespace rzq{
 namespace search{
@@ -23,27 +24,45 @@ Frontier::~Frontier() {
   return;
 }
 
+bool dominates(const Label& l1, const Label& l2) {
+  if (l1.g[0] > l2.g[0] || l1.g[1] > l2.g[1]) {
+    return false;
+  }
+  for (int i = 0; i < l1.b.size(); i++) {
+    if (!l1.b[i] && l2.b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 
 bool Frontier::Check(const Label& l) const {
   if (labels.empty()) {
     return false;
   }
-  int flag = 0;
+  // int flag = 0;
+  // for (auto it = labels.begin(); it != labels.end(); it++) {
+  //   flag = 0;
+  //   if (it->g[0] > l.g[0] || it->g[1] >= l.g[1]) {
+  //     continue;
+  //   }
+  //   for (int i = 0; i < l.b.size(); i++) {
+  //     if (l.b[i] && !it->b[i]) {
+  //       flag = 1;
+  //       break;
+  //     }
+  //   }
+  //   if (flag == 1) {
+  //     continue;
+  //   }
+  //   return true;
+  // }
+  // return false;
   for (auto it = labels.begin(); it != labels.end(); it++) {
-    flag = 0;
-    if (it->g[0] > l.g[0] || it->g[1] > l.g[1]) {
-      continue;
+    if (dominates(*it, l)) {
+      return true;
     }
-    for (int i = 0; i < l.b.size(); i++) {
-      if (l.b[i] && !it->b[i]) {
-        flag = 1;
-        break;
-      }
-    }
-    if (flag == 1) {
-      continue;
-    }
-    return true;
   }
   return false;
 }
@@ -55,7 +74,7 @@ void Frontier::Update(Label l) {
   }
   int flag = 0;
   for (auto it = labels.begin(); it != labels.end(); ) {
-    if (it->g[0] < l.g[0] || it->g[1] < l.g[1]) {
+    if (it->g[0] < l.g[0] || it->g[1] <= l.g[1]) {
       it++;
       continue;
     }
@@ -160,19 +179,68 @@ bool MOTSPTW::_FeaCheck(const Label& l) const {
   if (l.g[1] + _service_time[l.v] > _tw[l.v].second) {
     return true;
   }
-  if (l.b[l.v] == true) {
+  if (l.b[l.v] != true) {
     return true;
   }
   return false;
 };
 
-bool MOTSPTW::_PostCheck(const Label& l) const {
+bool MOTSPTW::_PostCheck_1(const Label& l) const {
   for (int i = 0; i < l.b.size(); i++) {
     if (l.b[i] == true || i == l.v) {
       continue;
     }
     // For all nodes that have not been visited, check if the time window is violated.
     if (l.g[1] + _graph->GetCost(l.v, i)[1] + _service_time[i] > _tw[i].second) {
+      return true;
+    }
+  }
+  return false;
+};
+
+bool MOTSPTW::_PostCheck_2(const Label& l) const {
+  double min_time_cost = std::numeric_limits<double>::infinity();
+  for (int i = 0; i < l.b.size(); i++) {
+    if (l.b[i] == true) {
+      continue;
+    }
+    for (int j = 0; j < l.b.size(); j++) {
+      if (l.b[j] == true) {
+        continue;
+      }
+      if (i == j) {
+        continue;
+      }
+      if (min_time_cost > _graph->GetCost(i, j)[1]) {
+        min_time_cost = _graph->GetCost(i, j)[1];
+      }
+    }
+  }
+  if (min_time_cost == std::numeric_limits<double>::infinity()) {
+    return false;
+  }
+  double min_service_time = std::numeric_limits<double>::infinity();
+  for (int i = 0; i < l.b.size(); i++) {
+    if (l.b[i] == true) {
+      continue;
+    }
+    if (min_service_time > _service_time[i]) {
+      min_service_time = _service_time[i];
+    }
+  }
+
+  std::vector<double> ddl;
+  for (int i = 0; i < l.b.size(); i++) {
+    if (l.b[i] == true) {
+      continue;
+    }
+    ddl.push_back(_tw[i].second);
+  }
+
+  std::sort(ddl.begin(), ddl.end());
+
+  for (int i = 0; i < ddl.size(); i++) {
+    if (l.g[1] + (min_time_cost + min_service_time) * (i + 1) > ddl[i]) {
       return true;
     }
   }
@@ -215,7 +283,7 @@ void MOTSPTW::_InitFrontiers() {
 
 bool MOTSPTW::_IsDone(const Label& l) const {
   for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == false && i != l.v) {
+    if (l.b[i] == false) {
       return false;
     }
   }
@@ -226,9 +294,12 @@ int MOTSPTW::Search(long vo, long vd) {
     _InitFrontiers();
     _vo = vo;
     _vd = vd;
+    _res.num_generated_labels = 0;
     auto zero_vec = InitVecType(_graph->CostDim(), 0.0);
     BinaryServiceVec bo = InitVecType(_graph->NumVertex(), false);
+    bo[vo] = true;
     Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo), bo);
+    _res.num_generated_labels++;
     _label[lo.id] = lo;
     _parent[lo.id] = -1; 
 
@@ -237,13 +308,15 @@ int MOTSPTW::Search(long vo, long vd) {
     while (!_open.empty()) {
         Label l = *_open.begin();
         _open.erase(_open.begin());
-        if ( _FrontierCheck(l) || _SolutionCheck(l) ) {
-          // std::cout << "l: " << l << std::endl;
+        if (_FrontierCheck(l)) {
+          continue;
+        }
+        if (_SolutionCheck(l)) {
           continue;
         }
         _UpdateFrontier(l);
         if (_IsDone(l)) {
-            l.b[l.v] = true;
+            // std::cout << "solution found: " << l << std::endl;
             solu->Update(l);
         } else {
           auto succs = _graph->GetSuccs(l.v);
@@ -254,8 +327,10 @@ int MOTSPTW::Search(long vo, long vd) {
             CostVec gu = l.g + cvecs[idx];
             gu[1] += std::max(_tw[l.v].first - l.g[1], 0.0) + _service_time[l.v];
             BinaryServiceVec bu = l.b;
-            bu[l.v] = true;
+            bu[u] = !bu[u];
             Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u), bu);
+            _res.num_generated_labels++;
+            // std::cout << "l2: " << l2 << " parent: " << l.id << std::endl;
             _label[l2.id] = l2;
             _parent[l2.id] = l.id;
             if (_FrontierCheck(l2) || _SolutionCheck(l2))
@@ -268,7 +343,11 @@ int MOTSPTW::Search(long vo, long vd) {
               // std::cout << "l2: " << l2 << std::endl;
               continue;
             }
-            if (_PostCheck(l2)) {
+            if (_PostCheck_1(l2)) {
+              // std::cout << "l2: " << l2 << std::endl;
+              continue;
+            }
+            if (_PostCheck_2(l2)) {
               // std::cout << "l2: " << l2 << std::endl;
               continue;
             }
