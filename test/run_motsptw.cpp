@@ -37,6 +37,7 @@ int main(int argc, char* argv[]) {
         std::cout << std::endl;
         // cost
         std::cout << " cost = " << res.costs[k] << std::endl;
+        std::cout << " number of generated labels = " << res.num_generated_labels << std::endl;
     }
     return 0;
 }
