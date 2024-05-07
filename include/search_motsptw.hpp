@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <set>
 #include <vector>
+#include <queue>
+#include <functional>  
 
 namespace rzq {
 namespace search {
@@ -25,6 +27,13 @@ struct Label {
   BinaryServiceVec b;
   CostVec g;
   CostVec f;
+};
+
+class CompareLabel {
+public:
+  bool operator()(const Label& l1, const Label& l2) {
+    return l1.f[1] > l2.f[1];
+  }
 };
 
 struct MOTSPTWResult {
@@ -92,7 +101,7 @@ protected:
 
     long _label_id_gen = 0;
     long _vo = -1, _vd = -1;
-    std::vector<Label> _open;
+    std::priority_queue<Label, std::vector<Label>, CompareLabel> _open;
 
     // std::unordered_map<long, Label> _label;
     std::vector<Label> _label; 

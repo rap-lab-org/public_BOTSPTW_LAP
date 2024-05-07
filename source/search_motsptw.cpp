@@ -303,11 +303,11 @@ int MOTSPTW::Search(long vo, long vd) {
     _label[lo.id] = lo;
     _parent[lo.id] = -1; 
 
-    _open.push_back(lo);
+    _open.push(lo);
 
     while (!_open.empty()) {
-        Label l = *_open.begin();
-        _open.erase(_open.begin());
+        Label l = _open.top();
+        _open.pop();
         if (_FrontierCheck(l)) {
           continue;
         }
@@ -351,7 +351,7 @@ int MOTSPTW::Search(long vo, long vd) {
               // std::cout << "l2: " << l2 << std::endl;
               continue;
             }
-            _open.push_back(l2);
+            _open.push(l2);
           }
           // std::cout << "size of open: " << _open.size() << std::endl;
         }     
