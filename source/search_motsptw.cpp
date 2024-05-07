@@ -187,7 +187,7 @@ bool MOTSPTW::_FeaCheck(const Label& l) const {
 
 bool MOTSPTW::_PostCheck_1(const Label& l) const {
   for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == true || i == l.v) {
+    if (l.b[i] == true) {
       continue;
     }
     // For all nodes that have not been visited, check if the time window is violated.
@@ -201,7 +201,7 @@ bool MOTSPTW::_PostCheck_1(const Label& l) const {
 bool MOTSPTW::_PostCheck_2(const Label& l) const {
   std::priority_queue<double, std::vector<double>, std::greater<double>> sub_travel_time;
   for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == true) {
+    if (l.b[i] == true && i != l.v) {
       continue;
     }
     for (int j = 0; j < l.b.size(); j++) {
@@ -241,7 +241,6 @@ bool MOTSPTW::_PostCheck_2(const Label& l) const {
 
   for (int i = 0; i < ddl.size(); i++) {
     t += sub_travel_time.top() + sub_service_time.top();
-    // std::cout << t << std::endl;
     if (t > ddl[i]) {
       return true;
     }
@@ -349,7 +348,7 @@ int MOTSPTW::Search(long vo, long vd) {
               continue;
             }
             if (_PostCheck_2(l2)) {
-              // std::cout << "l2: " << l2 << std::endl;
+              std::cout << "l2: " << l2 << std::endl;
               continue;
             }
             _open.push(l2);
