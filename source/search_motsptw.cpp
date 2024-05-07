@@ -199,7 +199,7 @@ bool MOTSPTW::_PostCheck_1(const Label& l) const {
 };
 
 bool MOTSPTW::_PostCheck_2(const Label& l) const {
-  double min_time_cost = std::numeric_limits<double>::infinity();
+  std::priority_queue<double, std::vector<double>, std::greater<double>> sub_travel_time;
   for (int i = 0; i < l.b.size(); i++) {
     if (l.b[i] == true) {
       continue;
@@ -211,22 +211,20 @@ bool MOTSPTW::_PostCheck_2(const Label& l) const {
       if (i == j) {
         continue;
       }
-      if (min_time_cost > _graph->GetCost(i, j)[1]) {
-        min_time_cost = _graph->GetCost(i, j)[1];
-      }
+      sub_travel_time.push(_graph->GetCost(i, j)[1]);
     }
   }
-  if (min_time_cost == std::numeric_limits<double>::infinity()) {
+
+  if (sub_travel_time.empty()) {
     return false;
   }
-  double min_service_time = std::numeric_limits<double>::infinity();
+
+  std::priority_queue<double, std::vector<double>, std::greater<double>> sub_service_time;
   for (int i = 0; i < l.b.size(); i++) {
     if (l.b[i] == true) {
       continue;
     }
-    if (min_service_time > _service_time[i]) {
-      min_service_time = _service_time[i];
-    }
+    sub_service_time.push(_service_time[i]);
   }
 
   std::vector<double> ddl;
@@ -239,10 +237,16 @@ bool MOTSPTW::_PostCheck_2(const Label& l) const {
 
   std::sort(ddl.begin(), ddl.end());
 
+  double t = l.g[1];
+
   for (int i = 0; i < ddl.size(); i++) {
-    if (l.g[1] + (min_time_cost + min_service_time) * (i + 1) > ddl[i]) {
+    t += sub_travel_time.top() + sub_service_time.top();
+    // std::cout << t << std::endl;
+    if (t > ddl[i]) {
       return true;
     }
+    sub_travel_time.pop();
+    sub_service_time.pop();
   }
   return false;
 };
@@ -308,10 +312,7 @@ int MOTSPTW::Search(long vo, long vd) {
     while (!_open.empty()) {
         Label l = _open.top();
         _open.pop();
-        if (_FrontierCheck(l)) {
-          continue;
-        }
-        if (_SolutionCheck(l)) {
+        if (_FrontierCheck(l) || _SolutionCheck(l)) {
           continue;
         }
         _UpdateFrontier(l);
