@@ -3,6 +3,7 @@
 #include <memory>
 #include <fstream>
 #include <algorithm>
+#include <map>
 
 namespace rzq{
 namespace search{
@@ -116,32 +117,59 @@ void MOTSPTW::SetServiceTime(std::vector<double> st) {
   _service_time = st;
 };
 
-void MOTSPTW::InitHeu(long vd) {
-  // SimpleTimer timer;
-  // timer.Start();
+// void MOTSPTW::InitHeu(long vd) {
+//   // SimpleTimer timer;
+//   // timer.Start();
 
-  // _dijks.resize(_graph->CostDim());
-  // for (size_t i = 0; i<_graph->CostDim(); i++) {
-  //   _dijks[i].SetGraphPtr(_graph);
-  //   _dijks[i].ExhaustiveBackwards(vd, std::numeric_limits<double>::infinity(), i) ;
-  // }
-  // _res.rt_initHeu = timer.GetDurationSecond();
+//   // _dijks.resize(_graph->CostDim());
+//   // for (size_t i = 0; i<_graph->CostDim(); i++) {
+//   //   _dijks[i].SetGraphPtr(_graph);
+//   //   _dijks[i].ExhaustiveBackwards(vd, std::numeric_limits<double>::infinity(), i) ;
+//   // }
+//   // _res.rt_initHeu = timer.GetDurationSecond();
 
-  // G_DOM_CHECK_COUNT = 0; // reset dom check counter.
-  return ;
-};
+//   // G_DOM_CHECK_COUNT = 0; // reset dom check counter.
+//   return ;
+// };
 
-CostVec MOTSPTW::_Heuristic(long v) {
+CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceVec& b) {
   auto out = CostVec(_graph->CostDim(), 0);
+  double time_h = 0;
 
-  // for (size_t cdim = 0; cdim < out.size(); cdim++) {
-  //   out[cdim] = _dijks[cdim].GetDistValue(v);
-  //   // out[cdim] = 0;
-  //   if (out[cdim] < 0) {
-  //     throw std::runtime_error( "[ERROR], unavailable heuristic !?" );
-  //   }
-  // }
-  // std::cout << " h(" << v << ") = " << out << std::endl;
+  std::vector<bool> inMST(_graph->NumVertex(), false);
+  std::vector<double> key(_graph->NumVertex(), std::numeric_limits<double>::infinity());
+  std::vector<long> targets;
+
+  for (long i = 0; i < _graph->NumVertex(); i++) {
+    if (b[i] == true) {
+      continue;
+    }
+    targets.push_back(i);
+  }
+
+  std::priority_queue<PLD, std::vector<PLD>, ComparePLD> pq;
+  pq.push(std::make_pair(v, 0));
+  key[v] = 0;
+  while(!pq.empty()) {
+    long u = pq.top().first;
+    pq.pop();
+    if (inMST[u] == true) {
+      continue;
+    }
+    inMST[u] = true;
+    time_h += key[u];
+    for (auto i : targets) {
+      if (inMST[i] == false && key[i] > _graph->GetCost(u, i)[1]) {
+        key[i] = _graph->GetCost(u, i)[1];
+        pq.push(std::make_pair(i, key[i]));
+      }
+    }
+  }
+  
+  out[1] = time_h;
+
+  // std::cout << "here" << std::endl;
+
   return out;
 };
 
@@ -301,8 +329,9 @@ int MOTSPTW::Search(long vo, long vd) {
     auto zero_vec = InitVecType(_graph->CostDim(), 0.0);
     BinaryServiceVec bo = InitVecType(_graph->NumVertex(), false);
     bo[vo] = true;
-    Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo), bo);
+    Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo, bo), bo);
     _res.num_generated_labels++;
+    // std::cout << "num of labels: " << _res.num_generated_labels << std::endl;
     _label[lo.id] = lo;
     _parent[lo.id] = -1; 
 
@@ -316,7 +345,7 @@ int MOTSPTW::Search(long vo, long vd) {
         }
         _UpdateFrontier(l);
         if (_IsDone(l)) {
-            // std::cout << "solution found: " << l << std::endl;
+            std::cout << "solution found: " << l << std::endl;
             solu->Update(l);
         } else {
           auto succs = _graph->GetSuccs(l.v);
@@ -328,7 +357,7 @@ int MOTSPTW::Search(long vo, long vd) {
             gu[1] += std::max(_tw[l.v].first - l.g[1], 0.0) + _service_time[l.v];
             BinaryServiceVec bu = l.b;
             bu[u] = !bu[u];
-            Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u), bu);
+            Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u, bu), bu);
             _res.num_generated_labels++;
             // std::cout << "l2: " << l2 << " parent: " << l.id << std::endl;
             _label[l2.id] = l2;
@@ -347,11 +376,12 @@ int MOTSPTW::Search(long vo, long vd) {
               // std::cout << "l2: " << l2 << std::endl;
               continue;
             }
-            if (_PostCheck_2(l2)) {
-              std::cout << "l2: " << l2 << std::endl;
-              continue;
-            }
+            // if (_PostCheck_2(l2)) {
+            //   std::cout << "l2: " << l2 << std::endl;
+            //   continue;
+            // }
             _open.push(l2);
+            // std::cout << "l2: " << l2 << std::endl;
           }
           // std::cout << "size of open: " << _open.size() << std::endl;
         }     
@@ -366,7 +396,7 @@ int RunMOTSPTW(rzq::basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double
     planner.SetGraphPtr(g);
     planner.SetTimeWindow(tw);
     planner.SetServiceTime(st);
-    planner.InitHeu(vd);
+    // planner.InitHeu(vd);
     ret_flag = planner.Search(vo, vd);
     *res = planner.GetResult();
     return ret_flag;

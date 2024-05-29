@@ -36,6 +36,15 @@ public:
   }
 };
 
+typedef std::pair<long, double> PLD;
+
+class ComparePLD {
+public:
+  bool operator()(const PLD& p1, const PLD& p2) {
+    return p1.second > p2.second;
+  }
+};
+
 struct MOTSPTWResult {
   std::unordered_map< long, std::vector<long> > paths;
   std::unordered_map< long, CostVec > costs;
@@ -60,11 +69,11 @@ public:
     virtual void SetGraphPtr(basic::PlannerGraph* g); //
     virtual void SetTimeWindow(TimeWindowVec tw); //
     virtual void SetServiceTime(std::vector<double> st); //
-    virtual void InitHeu(long vd); //
+    // virtual void InitHeu(long vd); //
     virtual int Search(long vo, long vd) ;
     virtual MOTSPTWResult GetResult() const ; //
 protected:
-    virtual CostVec _Heuristic(long v) ; //
+    virtual CostVec _Heuristic(long v, const BinaryServiceVec& b) ; //
 
     // this method needs to new frontiers, which depend on the specific #obj.
     virtual void _UpdateFrontier(Label l) ; //
@@ -110,7 +119,7 @@ protected:
     std::vector<long> _parent;
 
     MOTSPTWResult _res;
-    std::vector<rzq::search::Dijkstra> _dijks;
+    // std::vector<rzq::search::Dijkstra> _dijks;
 
 };
 

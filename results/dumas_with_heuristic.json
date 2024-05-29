@@ -1,0 +1,812 @@
+[
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w20.003.txt",
+        "runtime": 20982.741,
+        "number_of_generated_labels": 18001,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w60.004.txt",
+        "runtime": 60061.971999999994,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w40.002.txt",
+        "runtime": 16996.803,
+        "number_of_generated_labels": 23641,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w40.005.txt",
+        "runtime": 170.053,
+        "number_of_generated_labels": 1481,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w100.004.txt",
+        "runtime": 2838.003,
+        "number_of_generated_labels": 15581,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w20.001.txt",
+        "runtime": 60060.96200000001,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w80.003.txt",
+        "runtime": 60061.812000000005,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w60.001.txt",
+        "runtime": 1133.863,
+        "number_of_generated_labels": 6181,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w80.001.txt",
+        "runtime": 1011.4689999999999,
+        "number_of_generated_labels": 6081,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w20.003.txt",
+        "runtime": 60059.584,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w100.001.txt",
+        "runtime": 60060.861000000004,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w20.004.txt",
+        "runtime": 60062.229999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w100.005.txt",
+        "runtime": 60061.692,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w20.002.txt",
+        "runtime": 3631.77,
+        "number_of_generated_labels": 6601,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w40.001.txt",
+        "runtime": 60058.208999999995,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w60.005.txt",
+        "runtime": 374.533,
+        "number_of_generated_labels": 3101,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w40.003.txt",
+        "runtime": 274.911,
+        "number_of_generated_labels": 1941,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w60.001.txt",
+        "runtime": 60061.177,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w80.005.txt",
+        "runtime": 60060.204,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w100.001.txt",
+        "runtime": 2646.198,
+        "number_of_generated_labels": 16881,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w20.004.txt",
+        "runtime": 60061.015,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w40.004.txt",
+        "runtime": 53931.134,
+        "number_of_generated_labels": 44161,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w80.003.txt",
+        "runtime": 859.516,
+        "number_of_generated_labels": 6181,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w100.002.txt",
+        "runtime": 60053.985,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w20.003.txt",
+        "runtime": 148.46599999999998,
+        "number_of_generated_labels": 1021,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w100.002.txt",
+        "runtime": 60061.248999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w60.004.txt",
+        "runtime": 60060.380000000005,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w40.005.txt",
+        "runtime": 60059.474,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w40.004.txt",
+        "runtime": 272.066,
+        "number_of_generated_labels": 2141,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w100.004.txt",
+        "runtime": 33605.958999999995,
+        "number_of_generated_labels": 75681,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w20.002.txt",
+        "runtime": 60041.413,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w100.003.txt",
+        "runtime": 60061.662,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w60.005.txt",
+        "runtime": 60061.97,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w60.002.txt",
+        "runtime": 60062.017,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w40.001.txt",
+        "runtime": 60052.174999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w20.004.txt",
+        "runtime": 60020.775,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w40.005.txt",
+        "runtime": 60060.265999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w60.004.txt",
+        "runtime": 60061.772,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w20.005.txt",
+        "runtime": 2561.857,
+        "number_of_generated_labels": 4721,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w40.001.txt",
+        "runtime": 60071.155,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w20.002.txt",
+        "runtime": 159.816,
+        "number_of_generated_labels": 1101,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w80.001.txt",
+        "runtime": 60058.356,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w100.002.txt",
+        "runtime": 3872.718,
+        "number_of_generated_labels": 20741,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w40.002.txt",
+        "runtime": 60051.616,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w40.002.txt",
+        "runtime": 60060.138,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w20.003.txt",
+        "runtime": 60047.561,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w80.003.txt",
+        "runtime": 60031.701,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w20.004.txt",
+        "runtime": 138.36599999999999,
+        "number_of_generated_labels": 941,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w20.003.txt",
+        "runtime": 60061.143000000004,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w40.004.txt",
+        "runtime": 60047.526,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w40.002.txt",
+        "runtime": 60060.172,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w80.002.txt",
+        "runtime": 60059.592000000004,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w20.004.txt",
+        "runtime": 27228.702999999998,
+        "number_of_generated_labels": 19081,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w40.005.txt",
+        "runtime": 60062.116,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w40.001.txt",
+        "runtime": 413.342,
+        "number_of_generated_labels": 2681,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w20.002.txt",
+        "runtime": 60058.58,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w60.003.txt",
+        "runtime": 16142.202999999998,
+        "number_of_generated_labels": 26001,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w40.001.txt",
+        "runtime": 60061.343,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w40.005.txt",
+        "runtime": 48595.799999999996,
+        "number_of_generated_labels": 45901,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w60.003.txt",
+        "runtime": 60059.465000000004,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w60.002.txt",
+        "runtime": 277.826,
+        "number_of_generated_labels": 2161,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w20.004.txt",
+        "runtime": 3139.064,
+        "number_of_generated_labels": 6721,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w80.002.txt",
+        "runtime": 654.6959999999999,
+        "number_of_generated_labels": 5381,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w60.001.txt",
+        "runtime": 14745.836000000001,
+        "number_of_generated_labels": 26321,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w40.005.txt",
+        "runtime": 60029.42,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w80.003.txt",
+        "runtime": 28365.797000000002,
+        "number_of_generated_labels": 53481,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w40.003.txt",
+        "runtime": 60053.326,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w60.002.txt",
+        "runtime": 15852.596,
+        "number_of_generated_labels": 29681,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w40.004.txt",
+        "runtime": 6107.968,
+        "number_of_generated_labels": 11601,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w20.001.txt",
+        "runtime": 99.797,
+        "number_of_generated_labels": 741,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w100.003.txt",
+        "runtime": 60063.97,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w100.003.txt",
+        "runtime": 1329.624,
+        "number_of_generated_labels": 7901,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w40.003.txt",
+        "runtime": 3901.337,
+        "number_of_generated_labels": 9041,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w40.003.txt",
+        "runtime": 60058.665,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w40.005.txt",
+        "runtime": 11896.368,
+        "number_of_generated_labels": 23761,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w40.003.txt",
+        "runtime": 60062.301,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w80.004.txt",
+        "runtime": 60052.312,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w80.005.txt",
+        "runtime": 60060.797999999995,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w60.005.txt",
+        "runtime": 60058.952,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w60.003.txt",
+        "runtime": 413.329,
+        "number_of_generated_labels": 2861,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w100.005.txt",
+        "runtime": 3388.49,
+        "number_of_generated_labels": 21241,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w80.005.txt",
+        "runtime": 60061.39,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w20.005.txt",
+        "runtime": 60059.568,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w80.004.txt",
+        "runtime": 1187.065,
+        "number_of_generated_labels": 7601,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w60.001.txt",
+        "runtime": 60060.508,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w40.002.txt",
+        "runtime": 60059.694,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w40.001.txt",
+        "runtime": 7687.663,
+        "number_of_generated_labels": 11641,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w80.001.txt",
+        "runtime": 60007.455,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w20.003.txt",
+        "runtime": 2930.167,
+        "number_of_generated_labels": 6161,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w80.002.txt",
+        "runtime": 60053.528,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w40.004.txt",
+        "runtime": 60059.248,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w60.001.txt",
+        "runtime": 60060.242000000006,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w60.005.txt",
+        "runtime": 20744.185999999998,
+        "number_of_generated_labels": 35961,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w60.003.txt",
+        "runtime": 60011.021,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w100.005.txt",
+        "runtime": 60059.554,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w60.005.txt",
+        "runtime": 60038.526,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w100.001.txt",
+        "runtime": 60049.425,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w40.004.txt",
+        "runtime": 60059.600000000006,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w40.001.txt",
+        "runtime": 60049.265,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w40.003.txt",
+        "runtime": 60061.699,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w100.004.txt",
+        "runtime": 60059.176999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w60.002.txt",
+        "runtime": 60016.258,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w20.001.txt",
+        "runtime": 60059.919,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w20.005.txt",
+        "runtime": 22387.426000000003,
+        "number_of_generated_labels": 13861,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w60.003.txt",
+        "runtime": 60062.086,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w80.004.txt",
+        "runtime": 36026.53,
+        "number_of_generated_labels": 61641,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w60.004.txt",
+        "runtime": 60062.214,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w40.002.txt",
+        "runtime": 319.301,
+        "number_of_generated_labels": 2001,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w20.005.txt",
+        "runtime": 60060.372,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w20.002.txt",
+        "runtime": 19553.838,
+        "number_of_generated_labels": 16501,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w60.002.txt",
+        "runtime": 60057.890999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w40.002.txt",
+        "runtime": 60011.706,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w60.003.txt",
+        "runtime": 60062.157999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w60.004.txt",
+        "runtime": 60061.296,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w20.004.txt",
+        "runtime": 60020.299,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w20.003.txt",
+        "runtime": 60062.559,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w40.003.txt",
+        "runtime": 60060.359,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w60.002.txt",
+        "runtime": 60062.161,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w80.001.txt",
+        "runtime": 41035.722,
+        "number_of_generated_labels": 60481,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w20.005.txt",
+        "runtime": 60062.958,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w20.001.txt",
+        "runtime": 60008.065,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w20.001.txt",
+        "runtime": 27023.175,
+        "number_of_generated_labels": 18781,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w80.002.txt",
+        "runtime": 60059.246999999996,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n40w20.001.txt",
+        "runtime": 3406.462,
+        "number_of_generated_labels": 6921,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n80w60.001.txt",
+        "runtime": 60042.303,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n150w20.002.txt",
+        "runtime": 60017.295,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w40.004.txt",
+        "runtime": 60062.109,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w20.001.txt",
+        "runtime": 60061.836,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w60.005.txt",
+        "runtime": 60062.19,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n100w20.002.txt",
+        "runtime": 60060.422000000006,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n60w80.004.txt",
+        "runtime": 60061.858,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w60.004.txt",
+        "runtime": 1005.4970000000001,
+        "number_of_generated_labels": 6461,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w80.005.txt",
+        "runtime": 1095.01,
+        "number_of_generated_labels": 7601,
+        "return_code": 0
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n200w20.005.txt",
+        "runtime": 60061.345,
+        "number_of_generated_labels": null,
+        "return_code": 124
+    },
+    {
+        "file": "/root/Code/24SP/mo-tsptw/data/Dumas_/n20w20.005.txt",
+        "runtime": 177.916,
+        "number_of_generated_labels": 1121,
+        "return_code": 0
+    }
+]
