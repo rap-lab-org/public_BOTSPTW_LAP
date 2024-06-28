@@ -136,35 +136,35 @@ CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceVec& b) {
   auto out = CostVec(_graph->CostDim(), 0);
   double time_h = 0;
 
-  std::vector<bool> inMST(_graph->NumVertex(), false);
-  std::vector<double> key(_graph->NumVertex(), std::numeric_limits<double>::infinity());
-  std::vector<long> targets;
+  // std::vector<bool> inMST(_graph->NumVertex(), false);
+  // std::vector<double> key(_graph->NumVertex(), std::numeric_limits<double>::infinity());
+  // std::vector<long> targets;
 
-  for (long i = 0; i < _graph->NumVertex(); i++) {
-    if (b[i] == true) {
-      continue;
-    }
-    targets.push_back(i);
-  }
+  // for (long i = 0; i < _graph->NumVertex(); i++) {
+  //   if (b[i] == true) {
+  //     continue;
+  //   }
+  //   targets.push_back(i);
+  // }
 
-  std::priority_queue<PLD, std::vector<PLD>, ComparePLD> pq;
-  pq.push(std::make_pair(v, 0));
-  key[v] = 0;
-  while(!pq.empty()) {
-    long u = pq.top().first;
-    pq.pop();
-    if (inMST[u] == true) {
-      continue;
-    }
-    inMST[u] = true;
-    time_h += key[u];
-    for (auto i : targets) {
-      if (inMST[i] == false && key[i] > _graph->GetCost(u, i)[1]) {
-        key[i] = _graph->GetCost(u, i)[1];
-        pq.push(std::make_pair(i, key[i]));
-      }
-    }
-  }
+  // std::priority_queue<PLD, std::vector<PLD>, ComparePLD> pq;
+  // pq.push(std::make_pair(v, 0));
+  // key[v] = 0;
+  // while(!pq.empty()) {
+  //   long u = pq.top().first;
+  //   pq.pop();
+  //   if (inMST[u] == true) {
+  //     continue;
+  //   }
+  //   inMST[u] = true;
+  //   time_h += key[u];
+  //   for (auto i : targets) {
+  //     if (inMST[i] == false && key[i] > _graph->GetCost(u, i)[1]) {
+  //       key[i] = _graph->GetCost(u, i)[1];
+  //       pq.push(std::make_pair(i, key[i]));
+  //     }
+  //   }
+  // }
   
   out[1] = time_h;
 
@@ -344,7 +344,7 @@ int MOTSPTW::Search(long vo, long vd) {
           continue;
         }
         _UpdateFrontier(l);
-        if (_IsDone(l)) {
+        if (_IsDone(l) && l.v == _vd) {
             std::cout << "solution found: " << l << std::endl;
             solu->Update(l);
         } else {
@@ -355,6 +355,10 @@ int MOTSPTW::Search(long vo, long vd) {
             auto u = succs[idx];
             CostVec gu = l.g + cvecs[idx];
             gu[1] += std::max(_tw[l.v].first - l.g[1], 0.0) + _service_time[l.v];
+            if (_key_nodes.find(l.v) != _key_nodes.end()) {
+              gu[0] += gu[1] - _tw[l.v].first;
+            }
+            // gu[1] += _service_time[l.v];
             BinaryServiceVec bu = l.b;
             bu[u] = !bu[u];
             Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u, bu), bu);
@@ -396,6 +400,10 @@ int RunMOTSPTW(rzq::basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double
     planner.SetGraphPtr(g);
     planner.SetTimeWindow(tw);
     planner.SetServiceTime(st);
+    planner._key_nodes.insert(8);
+    planner._key_nodes.insert(10);
+    planner._key_nodes.insert(14);
+    planner._key_nodes.insert(17);
     // planner.InitHeu(vd);
     ret_flag = planner.Search(vo, vd);
     *res = planner.GetResult();

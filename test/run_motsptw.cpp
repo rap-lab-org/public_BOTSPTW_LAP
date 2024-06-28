@@ -2,6 +2,8 @@
 #include "data_loader.hpp"
 #include <iostream>
 #include <string>
+#include <chrono>
+
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -22,7 +24,10 @@ int main(int argc, char* argv[]) {
     rzq::search::MOTSPTWResult res;
     std::vector<std::pair<double, double>> tw = dl.GetTw();
     std::vector<double> st = dl.GetSt();
+    auto start = std::chrono::high_resolution_clock::now();
     RunMOTSPTW(&g, tw, st, vo, vd, &res);
+    auto end = std::chrono::high_resolution_clock::now();
+
 
     // print paths, times and costs
     std::cout << "---- reprint solutions for more clarity:" << std::endl;
@@ -38,6 +43,9 @@ int main(int argc, char* argv[]) {
         // cost
         std::cout << " cost = " << res.costs[k] << std::endl;
         std::cout << " number of generated labels = " << res.num_generated_labels << std::endl;
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        std::cout << "run time: " << duration << "ms" << std::endl;
+
     }
     return 0;
 }

@@ -72,6 +72,7 @@ public:
     // virtual void InitHeu(long vd); //
     virtual int Search(long vo, long vd) ;
     virtual MOTSPTWResult GetResult() const ; //
+    std::set<long> _key_nodes;
 protected:
     virtual CostVec _Heuristic(long v, const BinaryServiceVec& b) ; //
 
