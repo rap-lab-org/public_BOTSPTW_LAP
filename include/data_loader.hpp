@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <set>
 
 #include "graph.hpp"
 
@@ -18,6 +19,7 @@ public:
     std::vector<std::pair<double, double>> GetTw();
     std::vector<double> GetSt();
     long GetVd();
+    std::set<long> GetKeys();
 protected:
     std::string fn;
     int n;
@@ -25,6 +27,7 @@ protected:
     std::vector<std::vector<double>> time;
     std::vector<std::pair<double, double>> tw;
     std::vector<double> st;
+    std::set<long> keys;
 };
 
 }

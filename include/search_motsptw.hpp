@@ -124,7 +124,7 @@ protected:
 
 };
 
-int RunMOTSPTW(basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, MOTSPTWResult* res);
+int RunMOTSPTW(basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res);
 
 
 }

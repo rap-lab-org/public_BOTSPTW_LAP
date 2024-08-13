@@ -21,11 +21,13 @@ int main(int argc, char* argv[]) {
     long vo = 0;
     long vd = dl.GetVd();
 
+    std::set<long> keys = dl.GetKeys();
+
     rzq::search::MOTSPTWResult res;
     std::vector<std::pair<double, double>> tw = dl.GetTw();
     std::vector<double> st = dl.GetSt();
     auto start = std::chrono::high_resolution_clock::now();
-    RunMOTSPTW(&g, tw, st, vo, vd, &res);
+    RunMOTSPTW(&g, tw, st, vo, vd, keys, &res);
     auto end = std::chrono::high_resolution_clock::now();
 
 

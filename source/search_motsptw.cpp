@@ -394,16 +394,13 @@ int MOTSPTW::Search(long vo, long vd) {
     return 1;
 }
 
-int RunMOTSPTW(rzq::basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, MOTSPTWResult* res) {
+int RunMOTSPTW(rzq::basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res) {
     int ret_flag = 0;
     auto planner = MOTSPTW();
     planner.SetGraphPtr(g);
     planner.SetTimeWindow(tw);
     planner.SetServiceTime(st);
-    planner._key_nodes.insert(8);
-    planner._key_nodes.insert(10);
-    planner._key_nodes.insert(14);
-    planner._key_nodes.insert(17);
+    planner._key_nodes = keys;
     // planner.InitHeu(vd);
     ret_flag = planner.Search(vo, vd);
     *res = planner.GetResult();

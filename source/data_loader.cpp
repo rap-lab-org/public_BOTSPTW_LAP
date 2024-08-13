@@ -20,7 +20,8 @@ void DataLoader::Load() {
     for (int i = 0; i < n; i++) {
         cost[i].resize(n);
         for (int j = 0; j < n; j++) {
-            file >> cost[i][j];
+            // file >> cost[i][j];
+            cost[i][j] = 0;
         }
     }
 
@@ -39,7 +40,15 @@ void DataLoader::Load() {
 
     st.resize(n);
     for (int i = 0; i < n; i++) {
-        file >> st[i];
+        // file >> st[i];
+        st[i] = 0;
+    }
+    int num_key;
+    long temp;
+    file >> num_key;
+    for (int i = 0; i < num_key; i++) {
+        file >> temp;
+        keys.insert(temp);
     }
 
     file.close();
@@ -71,6 +80,10 @@ std::vector<double> DataLoader::GetSt() {
 
 long DataLoader::GetVd() {
     return (n - 1);
+}
+
+std::set<long> DataLoader::GetKeys() {
+    return keys;
 }
 
 }
