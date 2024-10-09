@@ -41,6 +41,7 @@ build/
 
 build/
 
-.cache/
+**/.cache/
 
 *.log
+**/.launch.json

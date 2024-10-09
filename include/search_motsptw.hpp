@@ -48,7 +48,17 @@ public:
 struct MOTSPTWResult {
   std::unordered_map< long, std::vector<long> > paths;
   std::unordered_map< long, CostVec > costs;
-  long num_generated_labels;
+	bool timeout;
+	long max_qsize;
+  long num_expd, num_gen;
+	long frontier_pruned, sol_pruned, fea_pruned, post_pruned;
+	long post2_pruned;
+
+	void reset() {
+		timeout = false;
+		num_gen = num_expd = frontier_pruned = sol_pruned = fea_pruned = post_pruned = 0;
+		max_qsize = post2_pruned = 0;
+	}
 };
 
 std::ostream& operator<<(std::ostream& os, Label& l) ;
@@ -72,6 +82,9 @@ public:
     // virtual void InitHeu(long vd); //
     virtual int Search(long vo, long vd) ;
     virtual MOTSPTWResult GetResult() const ; //
+		inline void SetTimeLimit(double t) {
+			_tlimit = t;
+		}
     std::set<long> _key_nodes;
 protected:
     virtual CostVec _Heuristic(long v, const BinaryServiceVec& b) ; //
@@ -104,6 +117,7 @@ protected:
     Frontier* solu;
     TimeWindowVec _tw;
     std::vector<double> _service_time;
+		double _tlimit = 300; // time limit in seconds
 
     size_t __vec_alloc_total = 0;
     size_t __vec_alloc_batch = 1024;
@@ -124,7 +138,7 @@ protected:
 
 };
 
-int RunMOTSPTW(basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res);
+int RunMOTSPTW(basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit=300);
 
 
 }

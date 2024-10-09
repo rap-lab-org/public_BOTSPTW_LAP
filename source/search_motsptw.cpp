@@ -325,65 +325,86 @@ int MOTSPTW::Search(long vo, long vd) {
     _InitFrontiers();
     _vo = vo;
     _vd = vd;
-    _res.num_generated_labels = 0;
+    _res.reset();
     auto zero_vec = InitVecType(_graph->CostDim(), 0.0);
     BinaryServiceVec bo = InitVecType(_graph->NumVertex(), false);
     bo[vo] = true;
     Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo, bo), bo);
-    _res.num_generated_labels++;
+    _res.num_expd++;
     // std::cout << "num of labels: " << _res.num_generated_labels << std::endl;
     _label[lo.id] = lo;
     _parent[lo.id] = -1; 
 
     _open.push(lo);
 
+    auto tstart = std::chrono::high_resolution_clock::now();
     while (!_open.empty()) {
+				if (_open.size() > _res.max_qsize) _res.max_qsize = _open.size();
+
+				auto tcur = std::chrono::high_resolution_clock::now();
+				auto dur = std::chrono::duration<double>(tcur - tstart).count();
+				if (dur > _tlimit) {
+					_res.timeout = true;
+					break;
+				}
         Label l = _open.top();
         _open.pop();
-        if (_FrontierCheck(l) || _SolutionCheck(l)) {
-          continue;
-        }
+				if (_FrontierCheck(l)) {
+					_res.frontier_pruned++;
+					continue;
+				}
+				if (_SolutionCheck(l)) {
+					_res.sol_pruned++;
+					continue;
+				}
         _UpdateFrontier(l);
         if (_IsDone(l) && l.v == _vd) {
-            std::cout << "solution found: " << l << std::endl;
+            // std::cout << "solution found: " << l << std::endl;
             solu->Update(l);
         } else {
           auto succs = _graph->GetSuccs(l.v);
           auto cvecs = _graph->GetSuccCosts(l.v);
+          _res.num_expd++;
           for (int idx = 0; idx < succs.size(); idx++)
           {
             auto u = succs[idx];
             CostVec gu = l.g + cvecs[idx];
             gu[1] += std::max(_tw[l.v].first - l.g[1], 0.0) + _service_time[l.v];
             if (_key_nodes.find(l.v) != _key_nodes.end()) {
+							// update 2nd objective
+							// if the u is a key node, then apply penalty on 'later finish'
               gu[0] += gu[1] - _tw[l.v].first;
             }
             // gu[1] += _service_time[l.v];
             BinaryServiceVec bu = l.b;
             bu[u] = !bu[u];
             Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u, bu), bu);
-            _res.num_generated_labels++;
             // std::cout << "l2: " << l2 << " parent: " << l.id << std::endl;
             _label[l2.id] = l2;
             _parent[l2.id] = l.id;
-            if (_FrontierCheck(l2) || _SolutionCheck(l2))
-            {
-              // std::cout << "l2: " << l2 << std::endl;
-              continue;
-            }
+						_res.num_gen++;
             if (_FeaCheck(l2))
             {
-              // std::cout << "l2: " << l2 << std::endl;
+							_res.fea_pruned++;
               continue;
             }
             if (_PostCheck_1(l2)) {
-              // std::cout << "l2: " << l2 << std::endl;
+							_res.post_pruned++;
               continue;
             }
-            // if (_PostCheck_2(l2)) {
-            //   std::cout << "l2: " << l2 << std::endl;
-            //   continue;
-            // }
+						if (_FrontierCheck(l2)) {
+							_res.frontier_pruned++;
+							continue;
+						}
+            if (_SolutionCheck(l2))
+            {
+							_res.sol_pruned++;
+              continue;
+            }
+            if (_PostCheck_2(l2)) {
+							_res.post2_pruned++;
+              continue;
+            }
             _open.push(l2);
             // std::cout << "l2: " << l2 << std::endl;
           }
@@ -394,10 +415,11 @@ int MOTSPTW::Search(long vo, long vd) {
     return 1;
 }
 
-int RunMOTSPTW(rzq::basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res) {
+int RunMOTSPTW(rzq::basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit) {
     int ret_flag = 0;
     auto planner = MOTSPTW();
     planner.SetGraphPtr(g);
+		planner.SetTimeLimit(tlimit);
     planner.SetTimeWindow(tw);
     planner.SetServiceTime(st);
     planner._key_nodes = keys;
