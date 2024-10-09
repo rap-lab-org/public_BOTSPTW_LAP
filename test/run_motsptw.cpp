@@ -42,12 +42,18 @@ int main(int argc, char* argv[]) {
 		std::ofstream fout;
 		fout.open("output/res.csv", std::ios_base::app);
 
-		row << insname << ","   << std::setprecision(4) << duration << ","
-				<< res.timeout << "," << res.paths.size() << "," 
-				<< res.num_expd << "," << res.num_gen << ","
-				<< res.max_qsize		<< "," << res.frontier_pruned << ","
-				<< res.sol_pruned		<< "," << res.fea_pruned << ","
-				<< res.post_pruned	<< std::endl;
+		row << insname << ","   
+				<< keys.size() << ","
+				<< std::setprecision(4) << duration << "," 
+				<< res.timeout << "," 
+				<< res.paths.size() << "," 
+				<< res.num_expd << "," 
+				<< res.num_gen << ","
+				<< res.max_qsize		<< "," 
+				<< res.frontier_pruned << ","
+				<< res.sol_pruned		<< "," 
+				<< res.fea_pruned << ","
+				<< res.post_pruned << std::endl;
 
 		fout << row.str();
 		std::cout << row.str();
