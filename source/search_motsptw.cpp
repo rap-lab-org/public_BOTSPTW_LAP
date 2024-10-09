@@ -401,10 +401,10 @@ int MOTSPTW::Search(long vo, long vd) {
 							_res.sol_pruned++;
               continue;
             }
-            if (_PostCheck_2(l2)) {
-							_res.post2_pruned++;
-              continue;
-            }
+       //      if (_PostCheck_2(l2)) {
+							// _res.post2_pruned++;
+       //        continue;
+       //      }
             _open.push(l2);
             // std::cout << "l2: " << l2 << std::endl;
           }
