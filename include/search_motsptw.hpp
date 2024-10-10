@@ -104,6 +104,8 @@ protected:
 
     virtual bool _PostCheck_2(const Label& l) const;
 
+    virtual bool _PostCheck_N(const Label& l, int n) const;
+
     virtual void _PostProcRes(); //
 
     virtual std::vector<long> _BuildPath(long lid) ; //
@@ -111,6 +113,11 @@ protected:
     virtual void _InitFrontiers() ; //
 
     virtual bool _IsDone(const Label& l) const; //
+
+		void dbg_postcheck_N(const Label& l, const std::vector<int>& todo,
+				const std::vector<double>& ddl,
+				const std::vector<double>& travel,
+				const std::vector<double>& service) const;
 
     basic::PlannerGraph* _graph;
     std::vector< Frontier* > _alpha;
