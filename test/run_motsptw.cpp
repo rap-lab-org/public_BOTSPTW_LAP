@@ -54,7 +54,8 @@ int main(int argc, char* argv[]) {
 				<< res.frontier_pruned << ","
 				<< res.sol_pruned		<< "," 
 				<< res.fea_pruned << ","
-				<< res.post_pruned << std::endl;
+				<< res.post_pruned << "," 
+				<< res.post2_pruned << std::endl;
 
 		fout << row.str();
 		std::cout << row.str();
