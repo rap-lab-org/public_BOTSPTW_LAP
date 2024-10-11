@@ -15,16 +15,16 @@ namespace search {
 using namespace rzq::basic;
 
 typedef std::vector<double> CostVec;
-typedef ServiceVec BinaryServiceVec;
-// typedef ServiceBits BinaryServiceVec;
+// typedef ServiceVec BinaryServiceSet;
+typedef ServiceBits BinaryServiceSet;
 typedef std::vector<std::pair<double, double>> TimeWindowVec;
 
 struct Label {
 	Label() { };
-  Label(long id0, long v0, const CostVec& g0, const CostVec& f0, const BinaryServiceVec& b0): id(id0), v(v0), g(g0), f(f0), b(b0) { };
+  Label(long id0, long v0, const CostVec& g0, const CostVec& f0, const BinaryServiceSet& b0): id(id0), v(v0), g(g0), f(f0), b(b0) { };
   long id; // label's id, make it easy to look up.
   long v;
-  BinaryServiceVec b;
+  BinaryServiceSet b;
   CostVec g;
   CostVec f;
 };
@@ -73,7 +73,9 @@ public:
 
 	 bool dominates(const Label& l1, const Label& l2) const; 
 
-	 inline std::vector<Label> get_labels() { return labels; }
+		inline std::vector<Label> get_labels() { return labels; }
+		//  key field is non-decreasing in labels;
+		inline long key(const Label& l) const { return l.g[1]; }
 };
 
 class FastFrontier {
@@ -85,7 +87,7 @@ public:
 	std::multimap<long, Label> labels;
 
 	// g0: penalty, g1: arrival time, use g1 as key in map
-	long key(const Label& l) const { return l.g[1]; }
+	inline long key(const Label& l) const { return l.g[1]; }
 	bool dominates(const Label& l1, const Label& l2) const; 
 
 	inline std::vector<Label> get_labels() { 
@@ -114,7 +116,7 @@ public:
 		}
     std::set<long> _key_nodes;
 protected:
-    virtual CostVec _Heuristic(long v, const BinaryServiceVec& b) ; //
+    virtual CostVec _Heuristic(long v, const BinaryServiceSet& b) ; //
 
     // this method needs to new frontiers, which depend on the specific #obj.
     virtual void _UpdateFrontier(Label l) ; //

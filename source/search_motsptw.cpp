@@ -12,6 +12,7 @@ namespace rzq {
 namespace search {
 
 std::vector<int> _taskids;
+const bool DEBUG = false;
 
 std::ostream &operator<<(std::ostream &os, Label &l) {
   std::string s;
@@ -32,13 +33,15 @@ FastFrontier::~FastFrontier() { return; }
 
 // is l1 dominate l2
 bool Frontier::dominates(const Label &l1, const Label &l2) const {
-  if (l1.g[0] > l2.g[0] || l1.g[1] > l2.g[1]) {
+  if (l1.g[0] > l2.g[0]) {
     return false;
   }
 	if (l2.b.is_subset(l1.b)) {
-		// std::cout << "  prune: [" << l1.id << " " << l1.b.to_str() << " g:" << l1.g 
-		// 	<< "] dominates [" 
-		// 	<< l2.id << " " << l2.b.to_str() << " g:" << l2.g  << "]" << std::endl;
+		if (DEBUG) {
+			std::cout << "  DOM: [" << l1.id << " " << l1.b.to_str() << " g:" << l1.g 
+				<< "] dominates [" 
+				<< l2.id << " " << l2.b.to_str() << " g:" << l2.g  << "]" << std::endl;
+		}
 		return true;
 	}
   return false;
@@ -50,9 +53,11 @@ bool FastFrontier::dominates(const Label &l1, const Label &l2) const {
 	// l1.g[1] <= l2.g[1]
 	if (l1.g[0] > l2.g[0]) return false;
 	if (l2.b.is_subset(l1.b)) {
-		// std::cout << "  prune: [" << l1.id << " " << l1.b.to_str() << " g:" << l1.g 
-		// 	<< "] dominates [" 
-		// 	<< l2.id << " " << l2.b.to_str() << " g:" << l2.g  << "]" << std::endl;
+		if (DEBUG) {
+			std::cout << "  DOM:[" << l1.id << " " << l1.b.to_str() << " g:" << l1.g 
+				<< "] dominates [" 
+				<< l2.id << " " << l2.b.to_str() << " g:" << l2.g  << "]" << std::endl;
+		}
 		return true;
 	}
   return false;
@@ -62,11 +67,15 @@ bool Frontier::Check(const Label &l) const {
   if (labels.empty()) {
     return false;
   }
-  for (auto it = labels.begin(); it != labels.end(); it++) {
-    if (dominates(*it, l)) {
-      return true;
-    }
-  }
+	for (const auto& it: labels) {
+		if (dominates(it, l)) {
+			if (DEBUG) {
+				std::cout << "  prune in check: " << l.id << " is dominated by " << it.id << std::endl;
+			}
+			return true;
+		}
+		if (key(it) > key(l)) break;
+	}
   return false;
 }
 
@@ -75,7 +84,12 @@ bool FastFrontier::Check(const Label& l) const {
 	if (labels.empty()) { return false; }
 	for (const auto& [k, it]: labels) {
 		if (k > key(l)) break;
-		if (dominates(it, l)) return true;
+		if (dominates(it, l)) {
+			if (DEBUG) {
+				std::cout << "  prune in check: " << l.id << " is dominated by " << it.id << std::endl;
+			}
+			return true;
+		}
 	}
 	return false;
 }
@@ -85,14 +99,27 @@ void Frontier::Update(Label l) {
     labels.push_back(l);
     return;
   }
-  for (auto it = labels.begin(); it != labels.end();) {
+	int rmcnt = 0;
+	auto it = labels.rbegin();
+	auto tail = labels.rbegin();
+	while (it != labels.rend() && key(*it) == key(l)) {
 		if (dominates(l, *it)) {
-			it = labels.erase(it);
+			// move the item to tail, later will be removed from the tail
+			if (it != tail)
+				std::swap(*it, *tail);
+			++tail;
+			++rmcnt;
 		}
-		else {
-			it++;
+		++it;
+	}
+	while (rmcnt>0) {
+		auto l2 = labels.back();
+		if (DEBUG) {
+			std::cout << "  erase in update: " << l2.id << " is dominated by " << l.id << std::endl;
 		}
-  }
+		labels.pop_back();
+		--rmcnt;
+	}
   labels.push_back(l);
   return;
 }
@@ -108,6 +135,9 @@ void FastFrontier::Update(Label newl) {
 		const auto& [k, l] = *it;
 		assert (key(newl) <= key(l));
 		if (dominates(newl, l)) {
+			if (DEBUG) {
+				std::cout << "  erase in update: " << l.id << " is dominated by " << newl.id << std::endl;
+			}
 			it = labels.erase(it);
 		} else {
 			it++;
@@ -147,7 +177,7 @@ void MOTSPTW::SetServiceTime(std::vector<double> st) { _service_time = st; };
 //   return ;
 // };
 
-CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceVec &b) {
+CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceSet &b) {
   auto out = CostVec(_graph->CostDim(), 0);
   double time_h = 0;
 
@@ -182,8 +212,6 @@ CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceVec &b) {
   // }
 
   out[1] = time_h;
-
-  // std::cout << "here" << std::endl;
 
   return out;
 };
@@ -399,7 +427,7 @@ int MOTSPTW::Search(long vo, long vd) {
 	_taskids.reserve(_graph->NumVertex());
 	_taskids.clear();
   auto zero_vec = InitVecType(_graph->CostDim(), 0.0);
-  BinaryServiceVec bo(_graph->NumVertex());
+  BinaryServiceSet bo(_graph->NumVertex());
   bo.set(vo, true);
   Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo, bo), bo);
   _res.num_expd++;
@@ -432,13 +460,12 @@ int MOTSPTW::Search(long vo, long vd) {
     }
     _UpdateFrontier(l);
     if (_IsDone(l) && l.v == _vd) {
-      // std::cout << "solution found: " << l << std::endl;
       solu->Update(l);
     } else {
       auto succs = _graph->GetSuccs(l.v);
       auto cvecs = _graph->GetSuccCosts(l.v);
       _res.num_expd++;
-			// std::cout << "expd: " << l << std::endl;
+			if (DEBUG) std::cout << "expd: " << l << std::endl;
 			// iterate all unfinished tasks
       for (int idx = 0; idx < succs.size(); idx++) {
         auto u = succs[idx];
@@ -451,10 +478,10 @@ int MOTSPTW::Search(long vo, long vd) {
           gu[0] += gu[1] - _tw[l.v].first;
         }
         // gu[1] += _service_time[l.v];
-        BinaryServiceVec bu(l.b);
+        BinaryServiceSet bu(l.b);
         bu.set(u, true);
         Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u, bu), bu);
-        // std::cout << "  gen: " << l2 << " parent: " << l.id << std::endl;
+        if (DEBUG) std::cout << "  gen: " << l2 << " parent: " << l.id << std::endl;
         _label[l2.id] = l2;
         _parent[l2.id] = l.id;
         _res.num_gen++;
@@ -479,9 +506,7 @@ int MOTSPTW::Search(long vo, long vd) {
         //   continue;
         // }
         _open.push(l2);
-        // std::cout << "l2: " << l2 << std::endl;
       }
-      // std::cout << "size of open: " << _open.size() << std::endl;
     }
   }
   _PostProcRes();
