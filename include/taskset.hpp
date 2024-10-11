@@ -1,7 +1,6 @@
 #pragma once
 #include "vec_type.hpp"
 #include <bitset>
-#include <cstdint>
 #include <cstdlib>
 #include <string>
 #include <vector>
@@ -52,22 +51,31 @@ public:
   	}
 	}
 
-  std::string to_str() const { return std::ToString(data); }
+  std::string to_str() const {
+		std::string res = "|";
+		for (int i=0; i<data.size(); i++) res += std::to_string(data[i]);
+		res += "|";
+		std::reverse(res.begin(), res.end());
+		return res;
+	}
 };
 
 class ServiceBits {
+	typedef unsigned long long ull;
 public:
   // support max 256 bits
   // data[0]: 0 - 63
   // data[1]: 64 - 127
   // data[2]: 128 - 191
   // data[3]: 192 - 255
-  std::bitset<64> data[4];
+	static const ull B = 6;
+	static const ull N = 1<<B;
+  std::bitset<N> data[4];
   ServiceBits() { _size = -1; };
   ServiceBits(int n) { // init n bits to represent todo tasks
     // cannot larger than 256
-    if (n > 256)
-      exit(-1);
+    if (n > 4ull*N)
+      exit(1);
     _size = n;
 
     // 1. all tasks are marked as done
@@ -79,14 +87,14 @@ public:
     // 2. mark [0, n) tasks as todo (false)
     int bid = 0;
     while (n > 0) {
-      if (n > 64) {
+      if (n > N) {
 				// set all bits to 0
         data[bid].reset();
-        n -= 64;
+        n -= N;
         bid++;
       } else {
 				// set [0, n) bits to 0
-        data[bid] ^= (1 << n) - 1;
+        data[bid] ^= ((ull)1 << (ull)n) - (ull)1;
         break;
       }
     }
@@ -106,23 +114,23 @@ public:
   }
 
   inline bool is_all(bool v) const {
-    // for (int i=0; i<_size; i++) if (get(i) != v) return false;
-    // return true;
+    for (int i=0; i<_size; i++) if (get(i) != v) return false;
+    return true;
     if (v)
       return data[0].all() && data[1].all() && data[2].all() && data[3].all();
     else {
       int n = _size;
       int bid = 0;
       while (n > 0) {
-        if (n > 64) {
-          // all bits must be 0
+        if (n > N) {
+          // [bid*N, (bid+1)*N) bits must be 0
           if (data[bid].any())
             return false;
-          n -= 64;
+          n -= N;
           bid++;
         } else {
-          // 0..n-1 bits must be 0
-          if ((~data[bid]) != ((1 << n) - 1))
+          // [bid*N..n) bits must be 0
+          if ((~data[bid]) != (((ull)1 << (ull)n) - (ull)1))
             return false;
         }
       }
@@ -133,27 +141,30 @@ public:
   inline int size() const { return _size; }
 
   inline void set(int pos, bool v) {
-    auto bid = pos >> 6;
-    auto idx = pos & ((1 << 6) - 1);
+    auto bid = pos >> B;
+    auto idx = pos & (N - 1);
+    // auto bid = pos / N;
+    // auto idx = pos % N;
     data[bid][idx] = v;
   };
 
   inline bool get(int pos) const {
-    auto bid = pos >> 6;
-    auto idx = pos & ((1 << 6) - 1);
+    auto bid = pos >> B;
+    auto idx = pos & (N - 1);
+    // auto bid = pos / N;
+    // auto idx = pos % N;
     return data[bid][idx];
   }
 
   std::string to_str() const {
-    std::string res = "";
-    res += data[3].to_string();
-    res += data[2].to_string();
-    res += data[1].to_string();
-    res += data[0].to_string();
+    std::string res = "|";
+		for (int i=0; i<_size; i++) res += std::to_string(get(i));
+		res += "|";
+		std::reverse(res.begin(), res.end());
     return res;
   }
 
-  inline bool _is_subset(int bid, const std::bitset<64> &other) const {
+  inline bool _is_subset(int bid, const std::bitset<N> &other) const {
     // `this` is subset of `other`
     return (other & data[bid]) == data[bid];
   }
