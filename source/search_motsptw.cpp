@@ -12,7 +12,7 @@ namespace search {
 std::ostream &operator<<(std::ostream &os, Label &l) {
   std::string s;
   s = "{id:" + std::to_string(l.id) + ",v:" + std::to_string(l.v) +
-      ",b:" + ToString(l.b) + ",g:" + ToString(l.g) + ",f:" + ToString(l.f) +
+      ",b:" + ToString(l.b.data) + ",g:" + ToString(l.g) + ",f:" + ToString(l.f) +
       "}";
   os << s;
   return os;
@@ -27,12 +27,8 @@ bool dominates(const Label &l1, const Label &l2) {
   if (l1.g[0] > l2.g[0] || l1.g[1] > l2.g[1]) {
     return false;
   }
-  for (int i = 0; i < l1.b.size(); i++) {
-    if (!l1.b[i] && l2.b[i]) {
-      return false;
-    }
-  }
-  return true;
+	if (l2.b.is_subset(l1.b)) return true;
+  return false;
 }
 
 bool Frontier::Check(const Label &l) const {
@@ -192,7 +188,7 @@ bool MOTSPTW::_FeaCheck(const Label &l) const {
 
 bool MOTSPTW::_PostCheck_1(const Label &l) const {
   for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == true) {
+    if (l.b.get(i) == true) {
       continue;
     }
     // For all nodes that have not been visited, check if the time window is
@@ -209,11 +205,11 @@ bool MOTSPTW::_PostCheck_2(const Label &l) const {
   std::priority_queue<double, std::vector<double>, std::greater<double>>
       sub_travel_time;
   for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == true && i != l.v) {
+    if (l.b.get(i) == true && i != l.v) {
       continue;
     }
     for (int j = 0; j < l.b.size(); j++) {
-      if (l.b[j] == true) {
+      if (l.b.get(j) == true) {
         continue;
       }
       if (i == j) {
@@ -230,7 +226,7 @@ bool MOTSPTW::_PostCheck_2(const Label &l) const {
   std::priority_queue<double, std::vector<double>, std::greater<double>>
       sub_service_time;
   for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == true) {
+    if (l.b.get(i) == true) {
       continue;
     }
     sub_service_time.push(_service_time[i]);
@@ -238,7 +234,7 @@ bool MOTSPTW::_PostCheck_2(const Label &l) const {
 
   std::vector<double> ddl;
   for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == true) {
+    if (l.b.get(i) == true) {
       continue;
     }
     ddl.push_back(_tw[i].second);
@@ -321,7 +317,7 @@ bool MOTSPTW::_PostCheck_N(const Label &l, int n = 2) const {
   std::vector<int> todo;
   std::vector<double> ddl, sub_travel_time, sub_service_time;
   for (int i = 0; i < l.b.size() - 1; i++)
-    if (l.b[i] == false) {
+    if (l.b.get(i) == false) {
       todo.push_back(i);
     }
   if (n > todo.size())
@@ -402,12 +398,7 @@ void MOTSPTW::_InitFrontiers() {
 };
 
 bool MOTSPTW::_IsDone(const Label &l) const {
-  for (int i = 0; i < l.b.size(); i++) {
-    if (l.b[i] == false) {
-      return false;
-    }
-  }
-  return true;
+	return l.b.is_all(true);
 };
 
 int MOTSPTW::Search(long vo, long vd) {
@@ -416,8 +407,8 @@ int MOTSPTW::Search(long vo, long vd) {
   _vd = vd;
   _res.reset();
   auto zero_vec = InitVecType(_graph->CostDim(), 0.0);
-  BinaryServiceVec bo = InitVecType(_graph->NumVertex(), false);
-  bo[vo] = true;
+  BinaryServiceVec bo(_graph->NumVertex(), false);
+  bo.set(vo, true);
   Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo, bo), bo);
   _res.num_expd++;
   // std::cout << "num of labels: " << _res.num_generated_labels << std::endl;
@@ -455,10 +446,10 @@ int MOTSPTW::Search(long vo, long vd) {
       auto succs = _graph->GetSuccs(l.v);
       auto cvecs = _graph->GetSuccCosts(l.v);
       _res.num_expd++;
+			// iterate all unfinished tasks
       for (int idx = 0; idx < succs.size(); idx++) {
         auto u = succs[idx];
-        if (l.b[u] == true)
-          continue;
+				if (l.b.get(u)) continue;
         CostVec gu = l.g + cvecs[idx];
         gu[1] += std::max(_tw[l.v].first - l.g[1], 0.0) + _service_time[l.v];
         if (_key_nodes.find(l.v) != _key_nodes.end()) {
@@ -467,8 +458,8 @@ int MOTSPTW::Search(long vo, long vd) {
           gu[0] += gu[1] - _tw[l.v].first;
         }
         // gu[1] += _service_time[l.v];
-        BinaryServiceVec bu = l.b;
-        bu[u] = !bu[u];
+        BinaryServiceVec bu(l.b);
+        bu.set(u, true);
         Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u, bu), bu);
         // std::cout << "l2: " << l2 << " parent: " << l.id << std::endl;
         _label[l2.id] = l2;

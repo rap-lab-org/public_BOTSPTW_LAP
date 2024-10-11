@@ -1,6 +1,6 @@
 #include "search.hpp"
 #include "search_dijkstra.hpp"
-
+#include "taskset.hpp"
 #include <unordered_map>
 #include <unordered_set>
 #include <set>
@@ -14,14 +14,13 @@ namespace search {
 using namespace rzq::basic;
 
 typedef std::vector<double> CostVec;
-typedef std::vector<bool> BinaryServiceVec;
+// typedef std::vector<bool> BinaryServiceVec;
+typedef ServiceVec BinaryServiceVec;
 typedef std::vector<std::pair<double, double>> TimeWindowVec;
 
 struct Label {
-  Label() {};
-  Label(long id0, long v0, const CostVec& g0, const CostVec& f0, const BinaryServiceVec& b0) {
-    id = id0; v = v0; g = g0; f = f0; b = b0;
-  };
+	Label() { };
+  Label(long id0, long v0, const CostVec& g0, const CostVec& f0, const BinaryServiceVec& b0): id(id0), v(v0), g(g0), f(f0), b(b0) { };
   long id; // label's id, make it easy to look up.
   long v;
   BinaryServiceVec b;
