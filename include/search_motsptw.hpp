@@ -1,12 +1,12 @@
-#include "search.hpp"
-#include "search_dijkstra.hpp"
+#pragma once
+// #include "search.hpp"
+// #include "search_dijkstra.hpp"
+#include "graph.hpp"
 #include "taskset.hpp"
 #include <unordered_map>
-#include <unordered_set>
 #include <set>
 #include <vector>
 #include <queue>
-#include <functional>  
 
 namespace rzq {
 namespace search {
@@ -15,7 +15,8 @@ using namespace rzq::basic;
 
 typedef std::vector<double> CostVec;
 // typedef std::vector<bool> BinaryServiceVec;
-typedef ServiceVec BinaryServiceVec;
+// typedef ServiceVec BinaryServiceVec;
+typedef ServiceBits BinaryServiceVec;
 typedef std::vector<std::pair<double, double>> TimeWindowVec;
 
 struct Label {
@@ -101,8 +102,6 @@ protected:
 
     virtual bool _PostCheck_1(const Label& l) const;
 
-    virtual bool _PostCheck_2(const Label& l) const;
-
     virtual bool _PostCheck_N(const Label& l, int n) const;
 
     virtual void _PostProcRes(); //
@@ -148,4 +147,4 @@ int RunMOTSPTW(basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st,
 
 
 }
-}
+};

@@ -1,18 +1,18 @@
 #include "search_motsptw.hpp"
 #include <algorithm>
 #include <cassert>
-#include <fstream>
-#include <map>
-#include <memory>
 #include <set>
+#include <chrono>
 
 namespace rzq {
 namespace search {
 
+std::vector<int> _taskids;
+
 std::ostream &operator<<(std::ostream &os, Label &l) {
   std::string s;
   s = "{id:" + std::to_string(l.id) + ",v:" + std::to_string(l.v) +
-      ",b:" + ToString(l.b.data) + ",g:" + ToString(l.g) + ",f:" + ToString(l.f) +
+      ",b:" + l.b.to_str() + ",g:" + ToString(l.g) + ",f:" + ToString(l.f) +
       "}";
   os << s;
   return os;
@@ -187,10 +187,8 @@ bool MOTSPTW::_FeaCheck(const Label &l) const {
 };
 
 bool MOTSPTW::_PostCheck_1(const Label &l) const {
-  for (int i = 0; i < l.b.size(); i++) {
-    if (l.b.get(i) == true) {
-      continue;
-    }
+	l.b.all_notexists(_taskids);
+  for (const auto& i: _taskids) {
     // For all nodes that have not been visited, check if the time window is
     // violated.
     if (l.g[1] + _graph->GetCost(l.v, i)[1] + _service_time[i] >
@@ -201,59 +199,6 @@ bool MOTSPTW::_PostCheck_1(const Label &l) const {
   return false;
 };
 
-bool MOTSPTW::_PostCheck_2(const Label &l) const {
-  std::priority_queue<double, std::vector<double>, std::greater<double>>
-      sub_travel_time;
-  for (int i = 0; i < l.b.size(); i++) {
-    if (l.b.get(i) == true && i != l.v) {
-      continue;
-    }
-    for (int j = 0; j < l.b.size(); j++) {
-      if (l.b.get(j) == true) {
-        continue;
-      }
-      if (i == j) {
-        continue;
-      }
-      sub_travel_time.push(_graph->GetCost(i, j)[1]);
-    }
-  }
-
-  if (sub_travel_time.empty()) {
-    return false;
-  }
-
-  std::priority_queue<double, std::vector<double>, std::greater<double>>
-      sub_service_time;
-  for (int i = 0; i < l.b.size(); i++) {
-    if (l.b.get(i) == true) {
-      continue;
-    }
-    sub_service_time.push(_service_time[i]);
-  }
-
-  std::vector<double> ddl;
-  for (int i = 0; i < l.b.size(); i++) {
-    if (l.b.get(i) == true) {
-      continue;
-    }
-    ddl.push_back(_tw[i].second);
-  }
-
-  std::sort(ddl.begin(), ddl.end());
-
-  double t = l.g[1];
-
-  for (int i = 0; i < ddl.size(); i++) {
-    t += sub_travel_time.top() + sub_service_time.top();
-    if (t > ddl[i]) {
-      return true;
-    }
-    sub_travel_time.pop();
-    sub_service_time.pop();
-  }
-  return false;
-};
 
 void MOTSPTW::dbg_postcheck_N(const Label &l, const std::vector<int> &todo,
                               const std::vector<double> &ddl,
@@ -406,8 +351,10 @@ int MOTSPTW::Search(long vo, long vd) {
   _vo = vo;
   _vd = vd;
   _res.reset();
+	_taskids.reserve(_graph->NumVertex());
+	_taskids.clear();
   auto zero_vec = InitVecType(_graph->CostDim(), 0.0);
-  BinaryServiceVec bo(_graph->NumVertex(), false);
+  BinaryServiceVec bo(_graph->NumVertex());
   bo.set(vo, true);
   Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo, bo), bo);
   _res.num_expd++;
