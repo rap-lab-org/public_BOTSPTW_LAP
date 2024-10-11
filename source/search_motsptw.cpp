@@ -1,8 +1,12 @@
 #include "search_motsptw.hpp"
 #include <algorithm>
 #include <cassert>
+#include <iostream>
+#include <ostream>
+#include <random>
 #include <set>
 #include <chrono>
+#include <fstream>
 
 namespace rzq {
 namespace search {
@@ -22,12 +26,35 @@ Frontier::Frontier() { return; }
 
 Frontier::~Frontier() { return; }
 
+FastFrontier::FastFrontier() { return; }
+
+FastFrontier::~FastFrontier() { return; }
+
 // is l1 dominate l2
-bool dominates(const Label &l1, const Label &l2) {
+bool Frontier::dominates(const Label &l1, const Label &l2) const {
   if (l1.g[0] > l2.g[0] || l1.g[1] > l2.g[1]) {
     return false;
   }
-	if (l2.b.is_subset(l1.b)) return true;
+	if (l2.b.is_subset(l1.b)) {
+		// std::cout << "  prune: [" << l1.id << " " << l1.b.to_str() << " g:" << l1.g 
+		// 	<< "] dominates [" 
+		// 	<< l2.id << " " << l2.b.to_str() << " g:" << l2.g  << "]" << std::endl;
+		return true;
+	}
+  return false;
+}
+
+// is l1 dominate l2
+bool FastFrontier::dominates(const Label &l1, const Label &l2) const {
+	// precondition:
+	// l1.g[1] <= l2.g[1]
+	if (l1.g[0] > l2.g[0]) return false;
+	if (l2.b.is_subset(l1.b)) {
+		// std::cout << "  prune: [" << l1.id << " " << l1.b.to_str() << " g:" << l1.g 
+		// 	<< "] dominates [" 
+		// 	<< l2.id << " " << l2.b.to_str() << " g:" << l2.g  << "]" << std::endl;
+		return true;
+	}
   return false;
 }
 
@@ -35,24 +62,6 @@ bool Frontier::Check(const Label &l) const {
   if (labels.empty()) {
     return false;
   }
-  // int flag = 0;
-  // for (auto it = labels.begin(); it != labels.end(); it++) {
-  //   flag = 0;
-  //   if (it->g[0] > l.g[0] || it->g[1] >= l.g[1]) {
-  //     continue;
-  //   }
-  //   for (int i = 0; i < l.b.size(); i++) {
-  //     if (l.b[i] && !it->b[i]) {
-  //       flag = 1;
-  //       break;
-  //     }
-  //   }
-  //   if (flag == 1) {
-  //     continue;
-  //   }
-  //   return true;
-  // }
-  // return false;
   for (auto it = labels.begin(); it != labels.end(); it++) {
     if (dominates(*it, l)) {
       return true;
@@ -61,12 +70,21 @@ bool Frontier::Check(const Label &l) const {
   return false;
 }
 
+bool FastFrontier::Check(const Label& l) const {
+	// is l dominated by any existing labels?
+	if (labels.empty()) { return false; }
+	for (const auto& [k, it]: labels) {
+		if (k > key(l)) break;
+		if (dominates(it, l)) return true;
+	}
+	return false;
+}
+
 void Frontier::Update(Label l) {
   if (labels.empty()) {
     labels.push_back(l);
     return;
   }
-  int flag = 0;
   for (auto it = labels.begin(); it != labels.end();) {
 		if (dominates(l, *it)) {
 			it = labels.erase(it);
@@ -77,6 +95,25 @@ void Frontier::Update(Label l) {
   }
   labels.push_back(l);
   return;
+}
+
+void FastFrontier::Update(Label newl) {
+	if (labels.empty()) {
+		labels.insert({key(newl), newl});
+		return;
+	}
+	// l cannot dominate any item before 'it' 
+	auto it = labels.lower_bound(key(newl));
+	while (it != labels.end()) {
+		const auto& [k, l] = *it;
+		assert (key(newl) <= key(l));
+		if (dominates(newl, l)) {
+			it = labels.erase(it);
+		} else {
+			it++;
+		}
+	}
+	labels.insert(it, {key(newl), newl});
 }
 
 MOTSPTW::MOTSPTW(){};
@@ -267,7 +304,9 @@ bool MOTSPTW::_PostCheck_N(const Label &l, int n = 2) const {
     }
   if (n > todo.size())
     n = todo.size();
-  std::random_shuffle(todo.begin(), todo.end());
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::shuffle(todo.begin(), todo.end(), g);
   todo.erase(todo.begin() + n, todo.end());
 
   assert(todo.size() == n);
@@ -322,11 +361,17 @@ std::vector<long> MOTSPTW::_BuildPath(long lid) {
 };
 
 void MOTSPTW::_PostProcRes() {
-  for (auto lb : solu->labels) {
+	for (const auto& lb: solu->get_labels()) {
+  // for (const auto& [k, lb] : solu->labels) {
     long lid = lb.id;
     _res.paths[lid] = _BuildPath(lid);
     _res.costs[lid] = _label[lid].g;
   }
+	std::ofstream fout("./frontiers.csv");
+	fout << "v,labelnum" << std::endl;
+	for (int v=0; v<_graph->NumVertex(); v++) {
+		fout << v << "," << _alpha[v]->labels.size() << std::endl;
+	}
   return;
 };
 
@@ -336,9 +381,9 @@ void MOTSPTW::_InitFrontiers() {
   _alpha.resize(_graph->NumVertex()); // this requires the graph vertex are
                                       // numbered from 0 to |V|.
   for (int idx = 0; idx < _alpha.size(); idx++) {
-    _alpha[idx] = new Frontier;
+    _alpha[idx] = new SearchFrontier;
   }
-  solu = new Frontier;
+  solu = new SearchFrontier;
   return;
 };
 
@@ -393,6 +438,7 @@ int MOTSPTW::Search(long vo, long vd) {
       auto succs = _graph->GetSuccs(l.v);
       auto cvecs = _graph->GetSuccCosts(l.v);
       _res.num_expd++;
+			// std::cout << "expd: " << l << std::endl;
 			// iterate all unfinished tasks
       for (int idx = 0; idx < succs.size(); idx++) {
         auto u = succs[idx];
@@ -408,7 +454,7 @@ int MOTSPTW::Search(long vo, long vd) {
         BinaryServiceVec bu(l.b);
         bu.set(u, true);
         Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u, bu), bu);
-        // std::cout << "l2: " << l2 << " parent: " << l.id << std::endl;
+        // std::cout << "  gen: " << l2 << " parent: " << l.id << std::endl;
         _label[l2.id] = l2;
         _parent[l2.id] = l.id;
         _res.num_gen++;
@@ -428,10 +474,10 @@ int MOTSPTW::Search(long vo, long vd) {
           _res.sol_pruned++;
           continue;
         }
-        if (_PostCheck_N(l2, 2)) {
-          _res.post2_pruned++;
-          continue;
-        }
+        // if (_PostCheck_N(l2, 2)) {
+        //   _res.post2_pruned++;
+        //   continue;
+        // }
         _open.push(l2);
         // std::cout << "l2: " << l2 << std::endl;
       }

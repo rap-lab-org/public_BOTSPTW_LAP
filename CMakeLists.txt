@@ -3,7 +3,7 @@ project(motsptw)
 
 # find_package(Boost REQUIRED)
 
-set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
 
 file(GLOB_RECURSE ALL_HDRS "include/*.hpp")
 file(GLOB_RECURSE ALL_SRCS "source/*.cpp")

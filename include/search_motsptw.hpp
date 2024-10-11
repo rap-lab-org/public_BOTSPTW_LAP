@@ -3,6 +3,7 @@
 // #include "search_dijkstra.hpp"
 #include "graph.hpp"
 #include "taskset.hpp"
+#include <map>
 #include <unordered_map>
 #include <set>
 #include <vector>
@@ -14,9 +15,8 @@ namespace search {
 using namespace rzq::basic;
 
 typedef std::vector<double> CostVec;
-// typedef std::vector<bool> BinaryServiceVec;
-// typedef ServiceVec BinaryServiceVec;
-typedef ServiceBits BinaryServiceVec;
+typedef ServiceVec BinaryServiceVec;
+// typedef ServiceBits BinaryServiceVec;
 typedef std::vector<std::pair<double, double>> TimeWindowVec;
 
 struct Label {
@@ -70,9 +70,36 @@ public:
   virtual bool Check(const Label& l) const;
   virtual void Update(Label l);
   std::vector<Label> labels;
+
+	 bool dominates(const Label& l1, const Label& l2) const; 
+
+	 inline std::vector<Label> get_labels() { return labels; }
+};
+
+class FastFrontier {
+public:
+	FastFrontier();
+	~FastFrontier();
+	bool Check(const Label& l) const;
+	void Update(Label l);
+	std::multimap<long, Label> labels;
+
+	// g0: penalty, g1: arrival time, use g1 as key in map
+	long key(const Label& l) const { return l.g[1]; }
+	bool dominates(const Label& l1, const Label& l2) const; 
+
+	inline std::vector<Label> get_labels() { 
+		std::vector<Label> res;
+		for (auto& [k, l]: labels) res.push_back(l);
+		return res;
+	}
 };
 
 class MOTSPTW {
+
+typedef Frontier SearchFrontier;
+// typedef FastFrontier SearchFrontier;
+
 public:
     MOTSPTW(); //
     virtual ~MOTSPTW(); //
@@ -118,8 +145,8 @@ protected:
 				const std::vector<double>& service) const;
 
     basic::PlannerGraph* _graph;
-    std::vector< Frontier* > _alpha;
-    Frontier* solu;
+    std::vector< SearchFrontier* > _alpha;
+    SearchFrontier* solu;
     TimeWindowVec _tw;
     std::vector<double> _service_time;
 		double _tlimit = 300; // time limit in seconds
