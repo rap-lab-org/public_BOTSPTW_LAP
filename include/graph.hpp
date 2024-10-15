@@ -189,6 +189,20 @@ public:
    *
    */
   virtual std::string ToStr() const ;
+
+	inline std::vector<std::vector<double>> to_grid(int dim) {
+		std::vector<std::vector<double>> res;
+		auto n = NumVertex();
+		res.resize(n);
+		for (int i=0; i<n; i++) {
+			res[i].resize(n);
+			for (int j=0; j<n; j++) {
+				if (j != i) res[i][j] = GetCost(i, j)[dim];
+				else res[i][j] = 0;
+			}
+		}
+		return res;
+	}
 protected:
   std::vector< std::vector<long> > _to;
   std::vector< std::vector< std::vector<double> > > _to_cost;

@@ -13,11 +13,13 @@ namespace rzq {
 namespace search {
 
 using namespace rzq::basic;
-
-typedef std::vector<double> CostVec;
+using Grid = std::vector<std::vector<double>>;
+using CostVec = std::vector<double>;
 // typedef ServiceVec BinaryServiceSet;
-typedef ServiceBits BinaryServiceSet;
-typedef std::vector<std::pair<double, double>> TimeWindowVec;
+using BinaryServiceSet = ServiceBits ;
+using TimeWindowVec = std::vector<std::pair<double, double>>;
+
+extern const int DIM;
 
 struct Label {
 	Label() { };
@@ -104,7 +106,7 @@ typedef Frontier SearchFrontier;
 public:
     MOTSPTW(); //
     virtual ~MOTSPTW(); //
-    virtual void SetGraphPtr(basic::PlannerGraph* g); //
+    virtual void SetGraphPtr(Grid* g); //
     virtual void SetTimeWindow(TimeWindowVec tw); //
     virtual void SetServiceTime(std::vector<double> st); //
     // virtual void InitHeu(long vd); //
@@ -145,7 +147,7 @@ protected:
 				const std::vector<double>& travel,
 				const std::vector<double>& service) const;
 
-    basic::PlannerGraph* _graph;
+    Grid* _graph;
     std::vector< SearchFrontier* > _alpha;
     SearchFrontier* solu;
     TimeWindowVec _tw;
@@ -171,7 +173,7 @@ protected:
 
 };
 
-int RunMOTSPTW(basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit=300);
+int RunMOTSPTW(Grid* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit=300);
 
 
 }
