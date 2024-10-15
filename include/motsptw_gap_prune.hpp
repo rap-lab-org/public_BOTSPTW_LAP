@@ -1,0 +1,195 @@
+#pragma once
+#include "search_motsptw.hpp"
+#include "taskset.hpp"
+#include <queue>
+#include <set>
+
+namespace rzq {
+namespace search_gap_prune {
+
+using namespace rzq::basic;
+
+using CostVec = std::vector<double>;
+using Grid = std::vector<std::vector<double>>;
+using BinaryServiceSet = search::ServiceBits;
+using TimeWindowVec = std::vector<std::pair<double, double>>;
+using MOTSPTWResult = search::MOTSPTWResult ;
+using Vec3D = std::vector<Grid>;
+const int DIM = search::DIM;
+
+struct Label {
+	Label() { };
+  Label(long id0, long v0, const CostVec& g0, const CostVec& f0, const BinaryServiceSet& b0): id(id0), v(v0), g(g0), f(f0), b(b0) { };
+  long id; // label's id, make it easy to look up.
+  long v;
+  BinaryServiceSet b;
+  CostVec g;
+  CostVec f;
+};
+
+class CompareLabel {
+public:
+  bool operator()(const Label& l1, const Label& l2) {
+		if (l1.f[1] != l2.f[1]) return l1.f[1] > l2.f[1];
+		return l1.f[0] > l2.f[0];
+  }
+};
+
+
+std::ostream& operator<<(std::ostream& os, Label& l) ;
+
+class Frontier {
+public:
+  Frontier();
+  virtual ~Frontier();
+  virtual bool Check(const Label& l) const;
+  virtual void Update(Label l);
+  std::vector<Label> labels;
+
+	 bool dominates(const Label& l1, const Label& l2) const; 
+
+		inline std::vector<Label> get_labels() { return labels; }
+		//  key field is non-decreasing in labels;
+		inline long key(const Label& l) const { return l.g[1]; }
+
+		inline int get_NDs() { return labels.size(); }
+};
+
+class FastFrontier {
+public:
+	using LID = int; // label id
+	FastFrontier();
+	~FastFrontier();
+	bool Check(const Label& l) const;
+	void Update(Label l);
+	// std::multimap<long, LID> NDs;
+	std::vector<Label> NDs;
+	std::vector<Label> labels;
+
+	// g0: penalty, g1: arrival time, 
+	// use g0 as key in map, g1 is ignored due to dimension reduction
+	inline long key(const Label& l) const { return l.g[0]; }
+	bool dominates(const Label& l1, const Label& l2) const; 
+
+	inline std::vector<Label> get_labels() { 
+		return labels;
+	}
+
+	inline int get_NDs() { return NDs.size(); }
+};
+
+class MOTSPTW {
+
+using SearchFrontier = Frontier;
+
+public:
+    MOTSPTW(); //
+    virtual ~MOTSPTW(); //
+    virtual void SetGraphPtr(Grid* g); //
+    virtual void SetTimeWindow(TimeWindowVec tw); //
+    virtual void SetServiceTime(std::vector<double> st); //
+    // virtual void InitHeu(long vd); //
+    virtual int Search(long vo, long vd) ;
+    virtual MOTSPTWResult GetResult() const ; //
+		inline void SetTimeLimit(double t) {
+			_tlimit = t;
+		}
+    std::set<long> _key_nodes;
+protected:
+    virtual CostVec _Heuristic(long v, const BinaryServiceSet& b) ; //
+
+    // this method needs to new frontiers, which depend on the specific #obj.
+    virtual void _UpdateFrontier(Label l) ; //
+
+    virtual long _GenLabelId() ; //
+
+    virtual bool _FrontierCheck(const Label& l) const; //
+  
+    virtual bool _SolutionCheck(const Label& l) const; //
+
+    virtual bool _FeaCheck(const Label& l) const; //
+
+    virtual bool _PostCheck_1(const Label& l) const;
+
+    virtual bool _PostCheck_N(const Label& l, int n) const;
+
+    virtual void _PostProcRes(); //
+
+    virtual std::vector<long> _BuildPath(long lid) ; //
+
+    virtual void _InitFrontiers() ; //
+
+    virtual bool _IsDone(const Label& l) const; //
+
+		void dbg_postcheck_N(const Label& l, const std::vector<int>& todo,
+				const std::vector<double>& ddl,
+				const std::vector<double>& travel,
+				const std::vector<double>& service) const;
+
+    Grid* _graph;
+    std::vector< SearchFrontier* > _alpha;
+    SearchFrontier* solu;
+    TimeWindowVec _tw;
+    std::vector<double> _service_time;
+		double _tlimit = 300; // time limit in seconds
+
+    size_t __vec_alloc_total = 0;
+    size_t __vec_alloc_batch = 1024;
+    size_t __vec_alloc_batch_max = 1024*4;
+
+    long _label_id_gen = 0;
+    long _vo = -1, _vd = -1;
+    std::priority_queue<Label, std::vector<Label>, CompareLabel> _open;
+
+    // std::unordered_map<long, Label> _label;
+    std::vector<Label> _label; 
+
+    // std::unordered_map<long, long> _parent;
+    std::vector<long> _parent;
+
+    MOTSPTWResult _res;
+		Vec3D gap_verts;
+    // std::vector<rzq::search::Dijkstra> _dijks;
+
+		inline void _InitGapVerts() {
+			int n = _graph->size();
+			gap_verts.resize(n);
+			for (int i=0; i<n; i++) {
+				gap_verts[i].resize(n);
+				for (int j=0; j<n; j++) {
+					gap_verts[j].resize(n);
+					for (int j=0; j<n; j++) gap_verts[i][j].reserve(n);
+				}
+			}
+
+			for (int i=0; i<n; i++)
+			for (int j=0; j<n; j++) if (j != i) {
+				// i, k, j
+				for (int k=0; k<n; k++) if (k != i && k != j) {
+					auto dik = _graph->at(i).at(k);
+					auto dkj = _graph->at(k).at(j);
+					auto arrive_k_time = std::max(_tw[i].first + dik, _tw[k].first);
+					if (arrive_k_time + dkj <= _tw[j].first)
+						gap_verts[i][j].push_back(k);
+				}
+			}
+		}
+
+		inline bool _GapVertCheck(const Label& l, long j) {
+			for (const auto& k: gap_verts[l.v][j]) {
+				if (l.b.get(k)) continue;
+				if (_key_nodes.find(k) != _key_nodes.end()) continue;
+				const auto& curt = l.g[1];
+				const auto& dvk = _graph->at(l.v).at(k);
+				const auto& dkj = _graph->at(k).at(j);
+				if (curt + dvk + dkj <= _tw[j].first) return true;
+			}
+			return false;
+		}
+};
+
+int RunMOTSPTW(Grid* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit=300);
+
+
+}
+}
