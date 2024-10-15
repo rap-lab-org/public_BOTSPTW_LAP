@@ -10,6 +10,8 @@
 #include "search_motsptw.hpp"
 // variant: fast dominate
 #include "motsptw_fastdom.hpp"
+// variant: ddl based heuristic
+#include "motsptw_ddl_heur.hpp"
 
 const double TIMELIMIT = 300;
 
@@ -44,6 +46,22 @@ void run_fastdom(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::se
 }
 
 
+void run_ddl_heur(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::search_ddl_heur::MOTSPTWResult& res)  {
+    long vo = 0;
+    long vd = dl.GetVd();
+
+    std::set<long> keys = dl.GetKeys();
+
+    std::vector<std::pair<double, double>> tw = dl.GetTw();
+    std::vector<double> st = dl.GetSt();
+    auto start = std::chrono::high_resolution_clock::now();
+		rzq::search_ddl_heur::RunMOTSPTW(&g, tw, st, vo, vd, keys, &res, TIMELIMIT);
+    auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		res.runtime = duration;
+}
+
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "invalid input" << std::endl;
@@ -69,6 +87,9 @@ int main(int argc, char* argv[]) {
 		}
 		else if (solver == "fastdom") {
 			run_fastdom(dl, g, res);
+		}
+		else if (solver == "ddl_heur") {
+			run_ddl_heur(dl, g, res);
 		}
 		else {
 			std::cerr << "Invalid variant: [" << solver << "]" << std::endl;

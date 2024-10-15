@@ -6,7 +6,7 @@
 #include <set>
 
 namespace rzq {
-namespace search_fastdom {
+namespace search_ddl_heur{
 
 using namespace rzq::basic;
 
@@ -16,10 +16,11 @@ using TimeWindowVec = std::vector<std::pair<double, double>>;
 using MOTSPTWResult = search::MOTSPTWResult ;
 
 struct Label {
-	Label() { };
-  Label(long id0, long v0, const CostVec& g0, const CostVec& f0, const BinaryServiceSet& b0): id(id0), v(v0), g(g0), f(f0), b(b0) { };
+	Label() { ddl = 0; };
+  Label(long id0, long v0, const CostVec& g0, const CostVec& f0, const BinaryServiceSet& b0): id(id0), v(v0), g(g0), f(f0), b(b0) { ddl = 0; };
   long id; // label's id, make it easy to look up.
   long v;
+	double ddl;
   BinaryServiceSet b;
   CostVec g;
   CostVec f;
@@ -28,8 +29,10 @@ struct Label {
 class CompareLabel {
 public:
   bool operator()(const Label& l1, const Label& l2) {
-		if (l1.f[1] == l2.f[1]) return l1.f[0] > l2.f[0];
-    return l1.f[1] > l2.f[1];
+		if (l1.f[1] != l2.f[1]) return l1.f[1] > l2.f[1];
+		if (l1.f[0] != l2.f[0]) return l1.f[0] > l2.f[0];
+		return l1.ddl < l2.ddl;
+		// return l1.f[0] > l2.f[0];
   }
 };
 
@@ -78,7 +81,7 @@ public:
 
 class MOTSPTW {
 
-using SearchFrontier = FastFrontier;
+using SearchFrontier = Frontier;
 
 public:
     MOTSPTW(); //
@@ -118,6 +121,8 @@ protected:
     virtual void _InitFrontiers() ; //
 
     virtual bool _IsDone(const Label& l) const; //
+
+		void set_label_ddl(Label& l) const;
 
 		void dbg_postcheck_N(const Label& l, const std::vector<int>& todo,
 				const std::vector<double>& ddl,
