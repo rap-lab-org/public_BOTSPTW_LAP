@@ -50,8 +50,7 @@ bool Frontier::dominates(const Label &l1, const Label &l2) const {
 // is l1 dominate l2
 bool FastFrontier::dominates(const Label &l1, const Label &l2) const {
 	// precondition:
-	// l1.g[1] <= l2.g[1]
-	if (l1.g[0] > l2.g[0]) return false;
+	// l1.g[0] <= l2.g[0]
 	if (l2.b.is_subset(l1.b)) {
 		if (DEBUG) {
 			std::cout << "  DOM:[" << l1.id << " " << l1.b.to_str() << " g:" << l1.g 
@@ -81,16 +80,24 @@ bool Frontier::Check(const Label &l) const {
 
 bool FastFrontier::Check(const Label& l) const {
 	// is l dominated by any existing labels?
-	if (labels.empty()) { return false; }
-	for (const auto& [k, it]: labels) {
-		if (k > key(l)) break;
-		if (dominates(it, l)) {
+	for (const auto& it: NDs) {
+		if (key(it) <= key(l) && dominates(it, l)) {
 			if (DEBUG) {
 				std::cout << "  prune in check: " << l.id << " is dominated by " << it.id << std::endl;
 			}
 			return true;
 		}
 	}
+	// for (const auto& [k, id]: NDs) {
+	// 	if (k > key(l)) break;
+	// 	const Label& it = labels[id];
+	// 	if (dominates(it, l)) {
+	// 		if (DEBUG) {
+	// 			std::cout << "  prune in check: " << l.id << " is dominated by " << it.id << std::endl;
+	// 		}
+	// 		return true;
+	// 	}
+	// }
 	return false;
 }
 
@@ -113,8 +120,8 @@ void Frontier::Update(Label l) {
 		++it;
 	}
 	while (rmcnt>0) {
-		auto l2 = labels.back();
 		if (DEBUG) {
+			auto l2 = labels.back();
 			std::cout << "  erase in update: " << l2.id << " is dominated by " << l.id << std::endl;
 		}
 		labels.pop_back();
@@ -125,25 +132,43 @@ void Frontier::Update(Label l) {
 }
 
 void FastFrontier::Update(Label newl) {
-	if (labels.empty()) {
-		labels.insert({key(newl), newl});
-		return;
-	}
 	// l cannot dominate any item before 'it' 
-	auto it = labels.lower_bound(key(newl));
-	while (it != labels.end()) {
-		const auto& [k, l] = *it;
-		assert (key(newl) <= key(l));
-		if (dominates(newl, l)) {
-			if (DEBUG) {
-				std::cout << "  erase in update: " << l.id << " is dominated by " << newl.id << std::endl;
-			}
-			it = labels.erase(it);
-		} else {
-			it++;
+	int rmcnt = 0;
+	auto it = NDs.rbegin();
+	auto tail = NDs.rbegin();
+	while (it != NDs.rend()) {
+		if (key(*it) >= key(newl) && dominates(newl, *it)) {
+			if (it != tail) 
+				std::swap(*it, *tail);
+			++tail;
+			++rmcnt;
 		}
+		++it;
 	}
-	labels.insert(it, {key(newl), newl});
+	while (rmcnt>0) {
+		if (DEBUG) {
+			auto l2 = NDs.back();
+			std::cout << "  erase in update: " << l2.id << " is dominated by " << newl.id << std::endl;
+		}
+		NDs.pop_back();
+		--rmcnt;
+	}
+	// while (it != NDs.end()) {
+	// 	const auto& [k, lid] = *it;
+	// 	const Label& l = labels[lid];
+	// 	assert (key(newl) <= key(l));
+	// 	if (dominates(newl, l)) {
+	// 		if (DEBUG) {
+	// 			std::cout << "  erase in update: " << l.id << " is dominated by " << newl.id << std::endl;
+	// 		}
+	// 		it = NDs.erase(it);
+	// 	} else {
+	// 		it++;
+	// 	}
+	// }
+	labels.push_back(newl);
+	// NDs.insert(it, {key(newl), labels.size()-1});
+	NDs.push_back(newl);
 }
 
 MOTSPTW::MOTSPTW(){};
@@ -398,7 +423,7 @@ void MOTSPTW::_PostProcRes() {
 	std::ofstream fout("./frontiers.csv");
 	fout << "v,labelnum" << std::endl;
 	for (int v=0; v<_graph->NumVertex(); v++) {
-		fout << v << "," << _alpha[v]->labels.size() << std::endl;
+		fout << v << "," << _alpha[v]->get_NDs() << std::endl;
 	}
   return;
 };

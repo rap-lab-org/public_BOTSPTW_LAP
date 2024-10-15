@@ -32,6 +32,7 @@ struct Label {
 class CompareLabel {
 public:
   bool operator()(const Label& l1, const Label& l2) {
+		if (l1.f[1] == l2.f[1]) return l1.f[0] > l2.f[0];
     return l1.f[1] > l2.f[1];
   }
 };
@@ -76,25 +77,31 @@ public:
 		inline std::vector<Label> get_labels() { return labels; }
 		//  key field is non-decreasing in labels;
 		inline long key(const Label& l) const { return l.g[1]; }
+
+		inline int get_NDs() { return labels.size(); }
 };
 
 class FastFrontier {
 public:
+	using LID = int; // label id
 	FastFrontier();
 	~FastFrontier();
 	bool Check(const Label& l) const;
 	void Update(Label l);
-	std::multimap<long, Label> labels;
+	// std::multimap<long, LID> NDs;
+	std::vector<Label> NDs;
+	std::vector<Label> labels;
 
-	// g0: penalty, g1: arrival time, use g1 as key in map
-	inline long key(const Label& l) const { return l.g[1]; }
+	// g0: penalty, g1: arrival time, 
+	// use g0 as key in map, g1 is ignored due to dimension reduction
+	inline long key(const Label& l) const { return l.g[0]; }
 	bool dominates(const Label& l1, const Label& l2) const; 
 
 	inline std::vector<Label> get_labels() { 
-		std::vector<Label> res;
-		for (auto& [k, l]: labels) res.push_back(l);
-		return res;
+		return labels;
 	}
+
+	inline int get_NDs() { return NDs.size(); }
 };
 
 class MOTSPTW {
