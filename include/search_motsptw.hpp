@@ -37,15 +37,6 @@ public:
   }
 };
 
-typedef std::pair<long, double> PLD;
-
-class ComparePLD {
-public:
-  bool operator()(const PLD& p1, const PLD& p2) {
-    return p1.second > p2.second;
-  }
-};
-
 struct MOTSPTWResult {
   std::unordered_map< long, std::vector<long> > paths;
   std::unordered_map< long, CostVec > costs;
@@ -54,6 +45,7 @@ struct MOTSPTWResult {
   long num_expd, num_gen;
 	long frontier_pruned, sol_pruned, fea_pruned, post_pruned;
 	long post2_pruned;
+	double runtime;
 
 	void reset() {
 		timeout = false;
