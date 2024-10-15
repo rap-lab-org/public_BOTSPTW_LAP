@@ -174,7 +174,7 @@ MOTSPTW::~MOTSPTW() {
   return;
 }
 
-void MOTSPTW::SetGraphPtr(basic::PlannerGraph *g) { _graph = g; };
+void MOTSPTW::SetGraphPtr(Grid *g) { _graph = g; };
 
 void MOTSPTW::SetTimeWindow(TimeWindowVec tw) { _tw = tw; };
 
@@ -197,7 +197,7 @@ void MOTSPTW::SetServiceTime(std::vector<double> st) { _service_time = st; };
 // };
 
 CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceSet &b) {
-  auto out = CostVec(_graph->CostDim(), 0);
+  auto out = CostVec(DIM, 0);
   double time_h = 0;
 
   // std::vector<bool> inMST(_graph->NumVertex(), false);
@@ -275,7 +275,7 @@ bool MOTSPTW::_PostCheck_1(const Label &l) const {
   for (const auto& i: _taskids) {
     // For all nodes that have not been visited, check if the time window is
     // violated.
-    if (l.g[1] + _graph->GetCost(l.v, i)[1] + _service_time[i] >
+    if (l.g[1] + _graph->at(l.v).at(i) + _service_time[i] >
         _tw[i].second) {
       return true;
     }
@@ -303,7 +303,7 @@ void MOTSPTW::dbg_postcheck_N(const Label &l, const std::vector<int> &todo,
     // printf("t@cur: %f\n", l.g[1]);
     for (auto v : seq) {
       // printf("from %d to %d: %f\n", cur, v, _graph->GetCost(cur, v)[1]);
-      t = std::max(t + _graph->GetCost(cur, v)[1], _tw[v].first) +
+      t = std::max(t + _graph->at(cur).at(v), _tw[v].first) +
           _service_time[v];
       // printf("cur: %d, next: %d t@next: %f, tw:[%f, %f]\n", cur, v, t,
              // _tw[v].first, _tw[v].second);
@@ -360,11 +360,11 @@ bool MOTSPTW::_PostCheck_N(const Label &l, int n = 2) const {
 
   for (int i = 0; i < n; i++) {
     auto u = todo[i];
-    sub_travel_time.push_back(_graph->GetCost(l.v, u)[1]);
+    sub_travel_time.push_back(_graph->at(l.v).at(u));
     for (int j = i + 1; j < n; j++) {
       auto v = todo[j];
-      sub_travel_time.push_back(_graph->GetCost(u, v)[1]);
-      sub_travel_time.push_back(_graph->GetCost(v, u)[1]);
+      sub_travel_time.push_back(_graph->at(u).at(v));
+      sub_travel_time.push_back(_graph->at(v).at(u));
     }
   }
   if (sub_travel_time.empty())
@@ -416,7 +416,7 @@ void MOTSPTW::_PostProcRes() {
   }
 	std::ofstream fout("./frontiers.csv");
 	fout << "v,labelnum" << std::endl;
-	for (int v=0; v<_graph->NumVertex(); v++) {
+	for (int v=0; v<_graph->size(); v++) {
 		fout << v << "," << _alpha[v]->get_NDs() << std::endl;
 	}
   return;
@@ -425,7 +425,7 @@ void MOTSPTW::_PostProcRes() {
 void MOTSPTW::_UpdateFrontier(Label l) { _alpha[l.v]->Update(l); };
 
 void MOTSPTW::_InitFrontiers() {
-  _alpha.resize(_graph->NumVertex()); // this requires the graph vertex are
+  _alpha.resize(_graph->size()); // this requires the graph vertex are
                                       // numbered from 0 to |V|.
   for (int idx = 0; idx < _alpha.size(); idx++) {
     _alpha[idx] = new SearchFrontier;
@@ -457,10 +457,10 @@ int MOTSPTW::Search(long vo, long vd) {
   _vo = vo;
   _vd = vd;
   _res.reset();
-	_taskids.reserve(_graph->NumVertex());
+	_taskids.reserve(_graph->size());
 	_taskids.clear();
-  auto zero_vec = InitVecType(_graph->CostDim(), 0.0);
-  BinaryServiceSet bo(_graph->NumVertex());
+  auto zero_vec = InitVecType(DIM, 0.0);
+  BinaryServiceSet bo(_graph->size());
   bo.set(vo, true);
   Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo, bo), bo);
   _res.num_expd++;
@@ -495,15 +495,14 @@ int MOTSPTW::Search(long vo, long vd) {
     if (_IsDone(l) && l.v == _vd) {
       solu->Update(l);
     } else {
-      auto succs = _graph->GetSuccs(l.v);
-      auto cvecs = _graph->GetSuccCosts(l.v);
+			int n = _graph->size();
       _res.num_expd++;
 			if (DEBUG) std::cout << "expd: " << l << std::endl;
 			// iterate all unfinished tasks
-      for (int idx = 0; idx < succs.size(); idx++) {
-        auto u = succs[idx];
+      for (int u=0; u<n; u++) {
 				if (l.b.get(u)) continue;
-        CostVec gu = l.g + cvecs[idx];
+				auto dvu = _graph->at(l.v).at(u);
+        CostVec gu = {l.g[0], l.g[1]+dvu};
         gu[1] += std::max(_tw[l.v].first - l.g[1], 0.0) + _service_time[l.v];
         if (_key_nodes.find(l.v) != _key_nodes.end()) {
           // update 2nd objective
@@ -543,11 +542,13 @@ int MOTSPTW::Search(long vo, long vd) {
       }
     }
   }
+	auto tcur = std::chrono::high_resolution_clock::now();
+	_res.runtime = std::chrono::duration<double>(tcur - tstart).count();
   _PostProcRes();
   return 1;
 }
 
-int RunMOTSPTW(rzq::basic::PlannerGraph *g, TimeWindowVec tw,
+int RunMOTSPTW(Grid* g, TimeWindowVec tw,
                std::vector<double> st, long vo, long vd, std::set<long> keys,
                MOTSPTWResult *res, double tlimit) {
   int ret_flag = 0;

@@ -40,16 +40,11 @@ void run_fastdom(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::se
 void run_ddl_heur(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::search_ddl_heur::MOTSPTWResult& res)  {
     long vo = 0;
     long vd = dl.GetVd();
-
+		auto grid = g.to_grid(1);
     std::set<long> keys = dl.GetKeys();
-
     std::vector<std::pair<double, double>> tw = dl.GetTw();
     std::vector<double> st = dl.GetSt();
-    auto start = std::chrono::high_resolution_clock::now();
-		rzq::search_ddl_heur::RunMOTSPTW(&g, tw, st, vo, vd, keys, &res, TIMELIMIT);
-    auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		res.runtime = duration;
+		rzq::search_ddl_heur::RunMOTSPTW(&grid, tw, st, vo, vd, keys, &res, TIMELIMIT);
 }
 
 

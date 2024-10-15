@@ -11,9 +11,11 @@ namespace search_ddl_heur{
 using namespace rzq::basic;
 
 using CostVec = std::vector<double>;
+using Grid = std::vector<std::vector<double>>;
 using BinaryServiceSet = search::ServiceBits;
 using TimeWindowVec = std::vector<std::pair<double, double>>;
 using MOTSPTWResult = search::MOTSPTWResult ;
+const int DIM = search::DIM;
 
 struct Label {
 	Label() { ddl = 0; };
@@ -86,7 +88,7 @@ using SearchFrontier = Frontier;
 public:
     MOTSPTW(); //
     virtual ~MOTSPTW(); //
-    virtual void SetGraphPtr(basic::PlannerGraph* g); //
+    virtual void SetGraphPtr(Grid* g); //
     virtual void SetTimeWindow(TimeWindowVec tw); //
     virtual void SetServiceTime(std::vector<double> st); //
     // virtual void InitHeu(long vd); //
@@ -129,7 +131,7 @@ protected:
 				const std::vector<double>& travel,
 				const std::vector<double>& service) const;
 
-    basic::PlannerGraph* _graph;
+    Grid* _graph;
     std::vector< SearchFrontier* > _alpha;
     SearchFrontier* solu;
     TimeWindowVec _tw;
@@ -155,7 +157,7 @@ protected:
 
 };
 
-int RunMOTSPTW(basic::PlannerGraph* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit=300);
+int RunMOTSPTW(Grid* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit=300);
 
 
 }
