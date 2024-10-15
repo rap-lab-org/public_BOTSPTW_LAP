@@ -1,5 +1,3 @@
-#include "search_motsptw.hpp"
-#include "data_loader.hpp"
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -7,45 +5,83 @@
 #include <string>
 #include <chrono>
 
+#include "data_loader.hpp"
+// default planner
+#include "search_motsptw.hpp"
+// variant: fast dominate
+#include "motsptw_fastdom.hpp"
+
 const double TIMELIMIT = 300;
+
+void run_default(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::search::MOTSPTWResult& res)  {
+    long vo = 0;
+    long vd = dl.GetVd();
+
+    std::set<long> keys = dl.GetKeys();
+
+    std::vector<std::pair<double, double>> tw = dl.GetTw();
+    std::vector<double> st = dl.GetSt();
+    auto start = std::chrono::high_resolution_clock::now();
+		rzq::search::RunMOTSPTW(&g, tw, st, vo, vd, keys, &res, TIMELIMIT);
+    auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		res.runtime = duration;
+}
+
+void run_fastdom(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::search_fastdom::MOTSPTWResult& res)  {
+    long vo = 0;
+    long vd = dl.GetVd();
+
+    std::set<long> keys = dl.GetKeys();
+
+    std::vector<std::pair<double, double>> tw = dl.GetTw();
+    std::vector<double> st = dl.GetSt();
+    auto start = std::chrono::high_resolution_clock::now();
+		rzq::search_fastdom::RunMOTSPTW(&g, tw, st, vo, vd, keys, &res, TIMELIMIT);
+    auto end = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		res.runtime = duration;
+}
 
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
+    if (argc < 2) {
         std::cerr << "invalid input" << std::endl;
         return -1;
     }
+		std::string solver = "default";
+		if (argc > 2) {
+			solver = std::string(argv[2]);
+		}
 
     rzq::basic::SparseGraph g;
     std::string fn = argv[1];
 		// remove suffix ".txt"
 		auto spos = fn.find_last_of('/')+1;
 		std::string insname = fn.substr(spos, fn.length()-4-spos);
-
     rzq::basic::DataLoader dl(fn);
     dl.Load();
     dl.CreateGraph(g);
+		rzq::search::MOTSPTWResult res;
 
-    long vo = 0;
-    long vd = dl.GetVd();
-
-    std::set<long> keys = dl.GetKeys();
-
-    rzq::search::MOTSPTWResult res;
-    std::vector<std::pair<double, double>> tw = dl.GetTw();
-    std::vector<double> st = dl.GetSt();
-    auto start = std::chrono::high_resolution_clock::now();
-    RunMOTSPTW(&g, tw, st, vo, vd, keys, &res, TIMELIMIT);
-    auto end = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		if (solver == "default") {
+			run_default(dl, g, res);
+		}
+		else if (solver == "fastdom") {
+			run_fastdom(dl, g, res);
+		}
+		else {
+			std::cerr << "Invalid variant: [" << solver << "]" << std::endl;
+		}
 
 		std::stringstream row;
 		std::ofstream fout;
 		fout.open("output/res.csv", std::ios_base::app);
 
 		row << insname << ","   
-				<< keys.size() << ","
-				<< std::setprecision(4) << duration << "," 
+				<< solver << ","
+				<< dl.GetKeys().size() << ","
+				<< std::setprecision(4) << res.runtime << "," 
 				<< res.timeout << "," 
 				<< res.paths.size() << "," 
 				<< res.num_expd << "," 
@@ -61,7 +97,7 @@ int main(int argc, char* argv[]) {
 		std::cout << row.str();
 		fout.close();
 
-		fout.open("output/k" + std::to_string(keys.size()) + "_" + insname  + ".sol", std::ios_base::out);
+		fout.open("output/k" + std::to_string(dl.GetKeys().size()) + "_" + insname  + ".sol", std::ios_base::out);
 		for (auto iter: res.paths) {
 			long k = iter.first;
 			for (auto var: res.costs[k])
