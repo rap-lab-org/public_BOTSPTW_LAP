@@ -29,8 +29,8 @@ struct Label {
 class CompareLabel {
 public:
   bool operator()(const Label& l1, const Label& l2) {
-		if (l1.f[1] == l2.f[1]) return l1.f[0] > l2.f[0];
-    return l1.f[1] > l2.f[1];
+		if (l1.f[1] != l2.f[1]) return l1.f[1] > l2.f[1];
+		return l1.f[0] > l2.f[0];
   }
 };
 

@@ -68,13 +68,12 @@ bool Frontier::Check(const Label &l) const {
     return false;
   }
 	for (const auto& it: labels) {
-		if (dominates(it, l)) {
+		if (key(it) <= key(l) && dominates(it, l)) {
 			if (DEBUG) {
 				std::cout << "  prune in check: " << l.id << " is dominated by " << it.id << std::endl;
 			}
 			return true;
 		}
-		if (key(it) > key(l)) break;
 	}
   return false;
 }
@@ -111,7 +110,7 @@ void Frontier::Update(Label l) {
 	auto it = labels.rbegin();
 	auto tail = labels.rbegin();
 	while (it != labels.rend() && key(*it) == key(l)) {
-		if (dominates(l, *it)) {
+		if (key(*it) >= key(l) && dominates(l, *it)) {
 			// move the item to tail, later will be removed from the tail
 			if (it != tail)
 				std::swap(*it, *tail);
@@ -133,6 +132,11 @@ void Frontier::Update(Label l) {
 }
 
 void FastFrontier::Update(Label newl) {
+  if (labels.empty()) {
+    labels.push_back(newl);
+		NDs.push_back(newl);
+    return;
+  }
 	// l cannot dominate any item before 'it' 
 	int rmcnt = 0;
 	auto it = NDs.rbegin();

@@ -37,7 +37,8 @@ def main():
     }
     failed = []
     ks = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    cols = ['name', 'k', 'time', 'timeout', 'numsol', 'expd', 'gen', 'qsize', 'pr-frontier', 'pr-sol', 'pr-fea', 'pr-post']
+    cols = ['name', 'solver', 'k', 'time', 'timeout', 'numsol', 'expd', 'gen', 'qsize', 'pr-frontier', 'pr-sol',
+            'pr-fea', 'pr-post', 'pr-extra']
     header = ",".join(cols)
     with open('output/res.csv', 'w') as f:
         f.write(header + "\n")
