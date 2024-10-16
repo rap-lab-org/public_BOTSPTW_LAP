@@ -26,7 +26,8 @@ void run_default(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::se
 		rzq::search::RunMOTSPTW(&grid, tw, st, vo, vd, keys, &res, TIMELIMIT);
 }
 
-void run_fastdom(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::search_fastdom::MOTSPTWResult& res)  {
+void run_fastdom(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::search_fastdom::MOTSPTWResult& res,
+		bool use_gap_prune=false)  {
 
     long vo = 0;
     long vd = dl.GetVd();
@@ -34,7 +35,7 @@ void run_fastdom(rzq::basic::DataLoader& dl, rzq::basic::SparseGraph& g, rzq::se
     std::set<long> keys = dl.GetKeys();
     std::vector<std::pair<double, double>> tw = dl.GetTw();
     std::vector<double> st = dl.GetSt();
-		rzq::search_fastdom::RunMOTSPTW(&grid, tw, st, vo, vd, keys, &res, TIMELIMIT);
+		rzq::search_fastdom::RunMOTSPTW(&grid, tw, st, vo, vd, keys, &res, use_gap_prune, TIMELIMIT);
 }
 
 
@@ -84,7 +85,10 @@ int main(int argc, char* argv[]) {
 			run_default(dl, g, res);
 		}
 		else if (solver == "fastdom") {
-			run_fastdom(dl, g, res);
+			run_fastdom(dl, g, res, false);
+		}
+		else if (solver == "combi") {
+			run_fastdom(dl, g, res, true);
 		}
 		else if (solver == "ddl_heur") {
 			run_ddl_heur(dl, g, res);

@@ -15,6 +15,7 @@ using Grid = std::vector<std::vector<double>>;
 using BinaryServiceSet = search::ServiceBits;
 using TimeWindowVec = std::vector<std::pair<double, double>>;
 using MOTSPTWResult = search::MOTSPTWResult ;
+using Vec3D = std::vector<Grid>;
 const int DIM = search::DIM;
 
 struct Label {
@@ -130,6 +131,7 @@ public:
 			_tlimit = t;
 		}
     std::set<long> _key_nodes;
+		bool use_gap_prune = false;
 
 		bool isValid(const std::vector<long>& path, const CostVec& cost); 
 
@@ -195,11 +197,50 @@ protected:
     std::vector<long> _parent;
 
     MOTSPTWResult _res;
+		Vec3D gap_verts;
     // std::vector<rzq::search::Dijkstra> _dijks;
 
+		inline void _InitGapVerts() {
+			int n = _graph->size();
+			gap_verts.resize(n);
+			for (int i=0; i<n; i++) {
+				gap_verts[i].resize(n);
+				for (int j=0; j<n; j++) {
+					gap_verts[j].resize(n);
+					for (int j=0; j<n; j++) gap_verts[i][j].reserve(n);
+				}
+			}
+
+			// for any pair of (i, j), add k to record if
+			// i->k->j before j's start time
+			// this means i->k->j dominates i->j
+			for (int i=0; i<n; i++)
+			for (int j=0; j<n; j++) if (j != i) {
+				// i, k, j
+				for (int k=0; k<n; k++) if (k != i && k != j) {
+					auto dik = _graph->at(i).at(k);
+					auto dkj = _graph->at(k).at(j);
+					auto arrive_k_time = std::max(_tw[i].first + dik, _tw[k].first);
+					if (arrive_k_time + dkj <= _tw[j].first)
+						gap_verts[i][j].push_back(k);
+				}
+			}
+		}
+
+		inline bool _GapVertCheck(const Label& l, long j) {
+			for (const auto& k: gap_verts[l.v][j]) {
+				if (l.b.get(k)) continue;
+				if (_key_nodes.find(k) != _key_nodes.end()) continue;
+				const auto& curt = l.g[1];
+				const auto& dvk = _graph->at(l.v).at(k);
+				const auto& dkj = _graph->at(k).at(j);
+				if (std::max(curt + dvk, _tw[k].first) + dkj <= _tw[j].first) return true;
+			}
+			return false;
+		}
 };
 
-int RunMOTSPTW(Grid* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, double tlimit=300);
+int RunMOTSPTW(Grid* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, bool use_gap_prune, double tlimit=300);
 
 
 }

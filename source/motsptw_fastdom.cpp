@@ -469,6 +469,7 @@ bool MOTSPTW::_IsDone(const Label &l) const {
 
 int MOTSPTW::Search(long vo, long vd) {
   _InitFrontiers();
+	_InitGapVerts();
   _vo = vo;
   _vd = vd;
   _res.reset();
@@ -516,6 +517,10 @@ int MOTSPTW::Search(long vo, long vd) {
 			// iterate all unfinished tasks
 			for (int u = 0; u < n; u++) {
 				if (l.b.get(u)) continue;
+				if (use_gap_prune && _GapVertCheck(l, u)) {
+					_res.post2_pruned++;
+					continue;
+				}
 				auto dvu = _graph->at(l.v).at(u);
         CostVec gu = {l.g[0], l.g[1]};
 				gu[1] = std::max(l.g[1]+dvu, _tw[u].first);
@@ -624,7 +629,7 @@ bool MOTSPTW::isValid(const std::vector<long>& path,
 
 int RunMOTSPTW(Grid* g, TimeWindowVec tw,
                std::vector<double> st, long vo, long vd, std::set<long> keys,
-               MOTSPTWResult *res, double tlimit) {
+               MOTSPTWResult *res, bool use_gap_prune, double tlimit) {
   int ret_flag = 0;
   auto planner = MOTSPTW();
   planner.SetGraphPtr(g);
@@ -633,6 +638,7 @@ int RunMOTSPTW(Grid* g, TimeWindowVec tw,
   planner.SetServiceTime(st);
   planner._key_nodes = keys;
   // planner.InitHeu(vd);
+	planner.use_gap_prune = use_gap_prune;
   ret_flag = planner.Search(vo, vd);
   *res = planner.GetResult();
 	if (!planner.isValidAll()) {
