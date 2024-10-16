@@ -1,5 +1,6 @@
 #include <iomanip>
 #include <iostream>
+#include <ostream>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -75,6 +76,8 @@ int main(int argc, char* argv[]) {
     std::string fn = argv[1];
 		// remove suffix ".txt"
 		auto spos = fn.find_last_of('/')+1;
+		auto kpos = fn.find_first_of('_')+1;
+		std::string kstr = fn.substr(kpos, fn.find('/', kpos)-kpos);
 		std::string insname = fn.substr(spos, fn.length()-4-spos);
     rzq::basic::DataLoader dl(fn);
     dl.Load();
@@ -106,7 +109,7 @@ int main(int argc, char* argv[]) {
 
 		row << insname << ","   
 				<< solver << ","
-				<< dl.GetKeys().size() << ","
+				<< kstr << ","
 				<< std::setprecision(4) << res.runtime << "," 
 				<< res.timeout << "," 
 				<< res.paths.size() << "," 
