@@ -162,6 +162,9 @@ protected:
 				}
 			}
 
+			// for any pair of (i, j), add k to record if
+			// i->k->j before j's start time
+			// this means i->k->j dominates i->j
 			for (int i=0; i<n; i++)
 			for (int j=0; j<n; j++) if (j != i) {
 				// i, k, j
@@ -182,7 +185,7 @@ protected:
 				const auto& curt = l.g[1];
 				const auto& dvk = _graph->at(l.v).at(k);
 				const auto& dkj = _graph->at(k).at(j);
-				if (curt + dvk + dkj <= _tw[j].first) return true;
+				if (std::max(curt + dvk, _tw[k].first) + dkj <= _tw[j].first) return true;
 			}
 			return false;
 		}
