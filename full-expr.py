@@ -1,57 +1,62 @@
 #!/usr/bin/env python
 from itertools import product
 import os
-from os import path
-import pandas as pd
+import subprocess
+from pathlib import Path
 
-def run_config(n: int, w: int, k: int) -> bool:
-    dirname = path.join('./data', f'Dumas_{k}')
-    ksize: int = n * k // 100
-    all_timeout = True
-    for i in range(5):
-        instance = f'n{n}w{w}.00{i+1}'
-        fname = path.join(dirname, f'{instance}.txt')
-        cmd = f"./build/run_motsptw {fname}"
-        os.system(cmd)
-        df = pd.read_csv('output/res.csv')
 
-        istimeout = df[(df['name'] == instance) & (df['k'] == ksize)]['timeout'].max()
-        if istimeout == 0:
-            all_timeout = False
-    return all_timeout
-
-def is_skip(n: int, w: int, k: int, failed: list[tuple[int, int, int]]):
-    for fn, fw, fk in failed:
-        if n >= fn and w >= fw and k >= fk:
-            return True
-    return False
+def run_instance(file: Path, respath: Path, frontierpath: Path, solver: str):
+    cmd = ["./build/run_motsptw", str(file), solver]
+    print(f">> {' '.join(cmd)}")
+    subprocess.run(cmd)
+    res = Path("./solutions.txt")
+    if res.exists():
+        res.rename(respath)
+    frontier = Path("./frontiers.csv")
+    if frontier.exists():
+        frontier.rename(frontierpath)
 
 
 def main():
-    paras = {
-            20: [20, 40, 60, 80, 100],
-            40: [20, 40, 60, 80, 100],
-            60: [20, 40, 60, 80, 100],
-            80: [20, 40, 60, 80],
-            100: [20, 40, 60],
-    }
-    failed = []
-    ks = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    cols = ['name', 'solver', 'k', 'time', 'timeout', 'numsol', 'expd', 'gen', 'qsize', 'pr-frontier', 'pr-sol',
-            'pr-fea', 'pr-post', 'pr-extra']
+    datasets = ["Dumas", "SolomonPotvinBengio"]
+    ks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    datadir = Path("./mo-data")
+    solvers = ["default", "fastdom", "gap_prune", "combine"]
+    cols = [
+        "name",
+        "solver",
+        "k",
+        "time",
+        "timeout",
+        "numsol",
+        "expd",
+        "gen",
+        "qsize",
+        "pr-frontier",
+        "pr-sol",
+        "pr-fea",
+        "pr-post",
+        "pr-extra",
+    ]
     header = ",".join(cols)
-    with open('output/res.csv', 'w') as f:
+    os.makedirs("output/solutions", exist_ok=True)
+    os.makedirs("output/frontiers", exist_ok=True)
+    with open("output/res.csv", "w") as f:
         f.write(header + "\n")
-    for n, ws in paras.items():
-        for w, k in product(ws, ks):
-            if is_skip(n, w, k, failed):
-                continue
-            all_timeout = run_config(n, w, k)
-            if all_timeout:
-                failed.append((n, w, k))
+    outdir = Path("./output/")
+    for ds, k in product(datasets, ks):
+        basedir = datadir.joinpath(f"{ds}_{k}")
+        for instance, solver in product(os.listdir(basedir), solvers):
+            file = basedir.joinpath(instance)
+            respath = outdir.joinpath("solutions", f"{solver}-k{k}-{instance}")
+            frontierpath = outdir.joinpath(
+                "frontiers", f"{solver}-k{k}-{instance[:-4]}.csv"
+            )
+            run_instance(file, respath, frontierpath, solver)
+
 
 if __name__ == "__main__":
     """
-    python expr.py
+    python full-expr.py
     """
     main()

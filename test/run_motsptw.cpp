@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 		else if (solver == "fastdom") {
 			run_fastdom(dl, g, res, false);
 		}
-		else if (solver == "combi") {
+		else if (solver == "combine") {
 			run_fastdom(dl, g, res, true);
 		}
 		else if (solver == "ddl_heur") {
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]) {
 		std::cout << row.str();
 		fout.close();
 
-		fout.open("output/" + solver + "-k" + std::to_string(dl.GetKeys().size()) + "-" + insname  + ".sol", std::ios_base::out);
+		fout.open("solutions.txt", std::ios_base::out);
 		for (auto iter: res.paths) {
 			long k = iter.first;
 			for (auto var: res.costs[k])
