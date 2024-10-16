@@ -1,5 +1,6 @@
 #pragma once
 #include "vec_type.hpp"
+#include <algorithm>
 #include <bitset>
 #include <cstdlib>
 #include <string>
