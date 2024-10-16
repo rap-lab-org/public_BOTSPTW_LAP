@@ -193,7 +193,6 @@ protected:
 		inline bool _GapVertCheck(const Label& l, long j) {
 			for (const auto& k: gap_verts[l.v][j]) {
 				if (l.b.get(k)) continue;
-				if (_key_nodes.find(k) != _key_nodes.end()) continue;
 				const auto& curt = l.g[1];
 				const auto& dvk = _graph->at(l.v).at(k);
 				const auto& dkj = _graph->at(k).at(j);
