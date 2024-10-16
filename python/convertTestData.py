@@ -1,6 +1,7 @@
 import sys
 import random
 def transform_file(input_filename, output_filename, load):
+    random.seed(0)
     with open(input_filename, 'r') as fin, open(output_filename, 'w') as fout:
         lines = fin.readlines()
         n = int(lines[0])

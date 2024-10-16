@@ -45,3 +45,4 @@ build/
 
 *.log
 **/.launch.json
+mo-data/*
