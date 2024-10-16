@@ -488,12 +488,12 @@ int MOTSPTW::Search(long vo, long vd) {
 			for (int u = 0; u < n; u++) {
 				if (l.b.get(u)) continue;
 				auto dvu = _graph->at(l.v).at(u);
-        CostVec gu = {l.g[0], l.g[1]+dvu};
-        gu[1] += std::max(_tw[l.v].first - l.g[1], 0.0) + _service_time[l.v];
-        if (_key_nodes.find(l.v) != _key_nodes.end()) {
+        CostVec gu = {l.g[0], l.g[1]};
+				gu[1] = std::max(l.g[1]+dvu, _tw[u].first);
+        if (_key_nodes.find(u) != _key_nodes.end()) {
           // update 2nd objective
           // if the u is a key node, then apply penalty on 'later finish'
-          gu[0] += gu[1] - _tw[l.v].first;
+          gu[0] += gu[1] - _tw[u].first;
         }
         // gu[1] += _service_time[l.v];
         BinaryServiceSet bu(l.b);
@@ -511,6 +511,7 @@ int MOTSPTW::Search(long vo, long vd) {
           _res.post_pruned++;
           continue;
         }
+				l2.g[1] += _service_time[l2.v];
         if (_FrontierCheck(l2)) {
           _res.frontier_pruned++;
           continue;
@@ -533,6 +534,65 @@ int MOTSPTW::Search(long vo, long vd) {
   return 1;
 }
 
+
+bool MOTSPTW::isValid(const std::vector<long>& path,
+		const CostVec& cost) {
+	std::set<long> vis;
+	double curt = 0;
+	long curv = _vo;
+	vis.insert(curv);
+	auto it = path.begin();
+	// path must start with _vo
+	if ((*it) != _vo) {
+		if (DEBUG) {
+			std::cout << "start is " << *it << " expect: " << _vo << std::endl;
+		}
+		return false;
+	}
+	double panelty = 0;
+	while ((++it) != path.end()) {
+		const auto& nxtv = *it;
+		curt += _graph->at(curv).at(nxtv);
+		// reach the next vert at time `curt`
+		curt = std::max(curt, _tw[nxtv].first) + _service_time[nxtv];
+		curv = nxtv;
+		// this vert has been visited before
+		if (vis.count(curv)) {
+			if (DEBUG) std::cout << "v:" << curv << " has been visited multiple times" << std::endl;
+			return false;
+		}
+		if (curt > _tw[curv].second) {
+			if (DEBUG) {
+				std::cout << "v:" << curv << " t: " << curt 
+				<< " over due: " << _tw[curv].second << std::endl;
+			}
+			return false;
+		}
+		if (_key_nodes.count(curv)) {
+			panelty += curt - _tw[curv].first;
+		}
+		vis.insert(curv);
+	}
+	// there must be some unvisited vertexes
+	if (vis.size() != path.size()) {
+		return false;
+	}
+	const double EPS = 1e-3;
+	if (fabs(cost[0]-panelty) > EPS) {
+		if (DEBUG) {
+			std::cout << "Inconsistent panelty: " << panelty << " expected: " << cost[0]  << std::endl;
+		}
+		return false;
+	}
+	if (fabs(curt-cost[1]) > EPS) {
+		if (DEBUG) {
+			std::cout << "Inconsistent arrival time: " << curt << " expected: " << cost[1]  << std::endl;
+		}
+		return false;
+	}
+	return true;
+}
+
 int RunMOTSPTW(Grid* g, TimeWindowVec tw,
                std::vector<double> st, long vo, long vd, std::set<long> keys,
                MOTSPTWResult *res, double tlimit) {
@@ -546,6 +606,10 @@ int RunMOTSPTW(Grid* g, TimeWindowVec tw,
   // planner.InitHeu(vd);
   ret_flag = planner.Search(vo, vd);
   *res = planner.GetResult();
+	if (!planner.isValidAll()) {
+		std::cout << "invalid plan" << std::endl;
+		exit(1);
+	}
   return ret_flag;
 }
 

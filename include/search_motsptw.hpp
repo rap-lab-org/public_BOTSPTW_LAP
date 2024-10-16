@@ -2,7 +2,6 @@
 // #include "search.hpp"
 // #include "search_dijkstra.hpp"
 #include "taskset.hpp"
-#include <map>
 #include <unordered_map>
 #include <set>
 #include <vector>
@@ -115,6 +114,18 @@ public:
 			_tlimit = t;
 		}
     std::set<long> _key_nodes;
+
+		bool isValid(const std::vector<long>& path, const CostVec& cost); 
+
+		inline bool isValidAll() {
+			bool res = true;
+			for (const auto& it: _res.paths) {
+				const auto& path = it.second;
+				const auto& cost = _res.costs.at(it.first);
+				res &= isValid(path, cost);
+			}
+			return res;
+		}
 protected:
     virtual CostVec _Heuristic(long v, const BinaryServiceSet& b) ; //
 
