@@ -3,6 +3,7 @@
 #include "taskset.hpp"
 #include <queue>
 #include <set>
+#include <map>
 
 namespace rzq {
 namespace search_fastdom {
@@ -42,32 +43,36 @@ public:
   Frontier();
   virtual ~Frontier();
   virtual bool Check(const Label& l) const;
-  virtual void Update(Label l);
+  virtual void Update(const Label& l);
   std::vector<Label> labels;
+	// all labels stored in planner
+	const std::vector<Label>* _all_labels;
 
 	 bool dominates(const Label& l1, const Label& l2) const; 
 
 		inline std::vector<Label> get_labels() { return labels; }
 		//  key field is non-decreasing in labels;
-		inline long key(const Label& l) const { return l.g[1]; }
+		inline double key(const Label& l) const { return l.g[1]; }
 
 		inline int get_NDs() { return labels.size(); }
 };
 
-class FastFrontier {
+class FastFrontierVec {
 public:
 	using LID = int; // label id
-	FastFrontier();
-	~FastFrontier();
+	FastFrontierVec();
+	~FastFrontierVec();
 	bool Check(const Label& l) const;
-	void Update(Label l);
+	void Update(const Label& l);
 	// std::multimap<long, LID> NDs;
 	std::vector<Label> NDs;
 	std::vector<Label> labels;
+	// all labels stored in planner
+	const std::vector<Label>* _all_labels;
 
 	// g0: penalty, g1: arrival time, 
 	// use g0 as key in map, g1 is ignored due to dimension reduction
-	inline long key(const Label& l) const { return l.g[0]; }
+	inline double key(const Label& l) const { return l.g[0]; }
 	bool dominates(const Label& l1, const Label& l2) const; 
 
 	inline std::vector<Label> get_labels() { 
@@ -77,9 +82,40 @@ public:
 	inline int get_NDs() { return NDs.size(); }
 };
 
+class FastFrontierMap{
+public:
+	using LID = int; // label id
+	using KEY = double; // key for 
+	FastFrontierMap();
+	~FastFrontierMap();
+	bool Check(const Label& l) const;
+	void Update(const Label& l);
+	std::multimap<KEY, LID> NDs;
+	std::vector<LID> lids;
+	// all labels store in planner	
+	const std::vector<Label>* _all_labels;
+
+	// g0: penalty, g1: arrival time, 
+	// use g0 as key in map, g1 is ignored due to dimension reduction
+	inline KEY key(const Label& l) const { return l.g[0]; }
+	bool dominates(const Label& l1, const Label& l2) const; 
+
+	inline std::vector<Label> get_labels() { 
+		std::vector<Label> res;
+		for (const auto& lid: lids) {
+			res.push_back(_all_labels->at(lid));
+		}
+		return res;
+	}
+
+	inline int get_NDs() { return NDs.size(); }
+};
+
 class MOTSPTW {
 
-using SearchFrontier = FastFrontier;
+// using vector-based fastdom is recommended due to the overhead of map
+using SearchFrontier = FastFrontierVec;
+// using SearchFrontier = FastFrontierMap;
 
 public:
     MOTSPTW(); //
