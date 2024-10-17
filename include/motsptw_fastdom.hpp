@@ -4,6 +4,7 @@
 #include <queue>
 #include <set>
 #include <map>
+#include <unordered_set>
 
 namespace rzq {
 namespace search_fastdom {
@@ -130,7 +131,7 @@ public:
 		inline void SetTimeLimit(double t) {
 			_tlimit = t;
 		}
-    std::set<long> _key_nodes;
+    std::unordered_set<long> _key_nodes;
 		bool use_gap_prune = false;
 
 		bool isValid(const std::vector<long>& path, const CostVec& cost); 
@@ -145,7 +146,10 @@ public:
 			return res;
 		}
 protected:
-    virtual CostVec _Heuristic(long v, const BinaryServiceSet& b) ; //
+    virtual CostVec _Heuristic(const Label& l) const; //
+
+		double _HeurArrivalTime(const Label& l) const;
+		double _HeurPenalty(const Label& l) const;
 
     // this method needs to new frontiers, which depend on the specific #obj.
     virtual void _UpdateFrontier(Label l) ; //
@@ -230,7 +234,6 @@ protected:
 		inline bool _GapVertCheck(const Label& l, long j) {
 			for (const auto& k: gap_verts[l.v][j]) {
 				if (l.b.get(k)) continue;
-				if (_key_nodes.find(k) != _key_nodes.end()) continue;
 				const auto& curt = l.g[1];
 				const auto& dvk = _graph->at(l.v).at(k);
 				const auto& dkj = _graph->at(k).at(j);

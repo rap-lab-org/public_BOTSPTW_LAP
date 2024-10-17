@@ -223,10 +223,7 @@ void MOTSPTW::SetServiceTime(std::vector<double> st) { _service_time = st; };
 //   return ;
 // };
 
-CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceSet &b) {
-  auto out = CostVec(DIM, 0);
-  double time_h = 0;
-
+double MOTSPTW::_HeurArrivalTime(const Label& l) const {
   // std::vector<bool> inMST(_graph->NumVertex(), false);
   // std::vector<double> key(_graph->NumVertex(),
   // std::numeric_limits<double>::infinity()); std::vector<long> targets;
@@ -256,9 +253,34 @@ CostVec MOTSPTW::_Heuristic(long v, const BinaryServiceSet &b) {
   //     }
   //   }
   // }
+	return 0;
+}
 
-  out[1] = time_h;
+double MOTSPTW::_HeurPenalty(const Label& l) const {
+	double res = 0;
+	std::vector<std::pair<double, int>> st;
+	for (const auto& k: _key_nodes) {
+		if (l.b.get(k) == 0) {
+			st.push_back({_tw[k].first, k});
+		}
+	}
+	std::sort (st.begin(), st.end());
+	double curt = l.g[1];
+	int curv = l.v;
+	for (const auto& it: st) {
+		const auto& id = it.second;
+		curt += _graph->at(curv).at(id);
+		curt = std::max(curt, _tw[id].first);
+		res += curt;
+		curv = id;
+	}
+	return res;
+}
 
+CostVec MOTSPTW::_Heuristic(const Label& l) const {
+  auto out = CostVec(DIM, 0);
+	// out[0] = _HeurPenalty(l);
+  // out[1] = _HeurArrivalTime(l);
   return out;
 };
 
@@ -442,9 +464,9 @@ void MOTSPTW::_PostProcRes() {
     _res.costs[lid] = _label[lid].g;
   }
 	std::ofstream fout("./frontiers.csv");
-	fout << "v,labelnum" << std::endl;
+	fout << "v,NDs,labels" << std::endl;
 	for (int v=0; v<_graph->size(); v++) {
-		fout << v << "," << _alpha[v]->get_NDs() << std::endl;
+		fout << v << "," << _alpha[v]->get_NDs() << ","  << _alpha[v]->labels.size() << std::endl;
 	}
   return;
 };
@@ -478,7 +500,8 @@ int MOTSPTW::Search(long vo, long vd) {
   auto zero_vec = InitVecType(DIM, 0.0);
   BinaryServiceSet bo(_graph->size());
   bo.set(vo, true);
-  Label lo(_GenLabelId(), vo, zero_vec, _Heuristic(_vo, bo), bo);
+  Label lo(_GenLabelId(), vo, zero_vec, zero_vec, bo);
+	lo.f = lo.g + _Heuristic(lo);
   _res.num_expd++;
   // std::cout << "num of labels: " << _res.num_generated_labels << std::endl;
   _label[lo.id] = lo;
@@ -532,7 +555,8 @@ int MOTSPTW::Search(long vo, long vd) {
         // gu[1] += _service_time[l.v];
         BinaryServiceSet bu(l.b);
         bu.set(u, true);
-        Label l2(_GenLabelId(), u, gu, gu + _Heuristic(u, bu), bu);
+        Label l2(_GenLabelId(), u, gu, gu, bu);
+				l2.f = l2.g + _Heuristic(l2);
         if (DEBUG) std::cout << "  gen: " << l2 << " parent: " << l.id << std::endl;
         _label[l2.id] = l2;
         _parent[l2.id] = l.id;
@@ -636,7 +660,7 @@ int RunMOTSPTW(Grid* g, TimeWindowVec tw,
   planner.SetTimeLimit(tlimit);
   planner.SetTimeWindow(tw);
   planner.SetServiceTime(st);
-  planner._key_nodes = keys;
+  planner._key_nodes = std::unordered_set<long>(keys.begin(), keys.end());
   // planner.InitHeu(vd);
 	planner.use_gap_prune = use_gap_prune;
   ret_flag = planner.Search(vo, vd);

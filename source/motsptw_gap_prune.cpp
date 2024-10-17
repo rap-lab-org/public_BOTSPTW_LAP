@@ -415,9 +415,9 @@ void MOTSPTW::_PostProcRes() {
     _res.costs[lid] = _label[lid].g;
   }
 	std::ofstream fout("./frontiers.csv");
-	fout << "v,labelnum" << std::endl;
+	fout << "v,NDs,labels" << std::endl;
 	for (int v=0; v<_graph->size(); v++) {
-		fout << v << "," << _alpha[v]->get_NDs() << std::endl;
+		fout << v << "," << _alpha[v]->get_NDs() << ","  << _alpha[v]->labels.size() << std::endl;
 	}
   return;
 };
