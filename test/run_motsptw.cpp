@@ -126,16 +126,18 @@ int main(int argc, char* argv[]) {
 		std::cout << row.str();
 		fout.close();
 
-		fout.open("solutions.txt", std::ios_base::out);
-		for (auto iter: res.paths) {
-			long k = iter.first;
-			for (auto var: res.costs[k])
-				fout << var << " ";
-			fout << std::endl;
+		if (res.paths.size() > 0) {
+			fout.open("solutions.txt", std::ios_base::out);
+			for (auto iter: res.paths) {
+				long k = iter.first;
+				for (auto var: res.costs[k])
+					fout << var << " ";
+				fout << std::endl;
 
-			for (auto v: res.paths[k])
-				fout << v << " ";
-			fout << std::endl;
+				for (auto v: res.paths[k])
+					fout << v << " ";
+				fout << std::endl;
+			}
 		}
     return 0;
 }
