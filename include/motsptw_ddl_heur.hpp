@@ -53,7 +53,7 @@ public:
 
 		inline std::vector<Label> get_labels() { return labels; }
 		//  key field is non-decreasing in labels;
-		inline long key(const Label& l) const { return l.g[1]; }
+		inline double key(const Label& l) const { return l.g[1]; }
 
 		inline int get_NDs() { return labels.size(); }
 };
@@ -71,7 +71,7 @@ public:
 
 	// g0: penalty, g1: arrival time, 
 	// use g0 as key in map, g1 is ignored due to dimension reduction
-	inline long key(const Label& l) const { return l.g[0]; }
+	inline double key(const Label& l) const { return l.g[0]; }
 	bool dominates(const Label& l1, const Label& l2) const; 
 
 	inline std::vector<Label> get_labels() { 
