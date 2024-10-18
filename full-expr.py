@@ -21,11 +21,14 @@ def run_instance(file: Path, respath: Path, frontierpath: Path, solver: str) -> 
 
 
 def main():
-    datasets = ["Dumas", "SolomonPotvinBengio"]
+    datasets = [
+            "Dumas", 
+            "SolomonPotvinBengio"
+    ]
     ks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     datadir = Path("./mo-data")
     solvers = [
-            "combine"
+            "combine",
             "gap_prune", 
             "fastdom", 
             "default", 
@@ -52,17 +55,21 @@ def main():
     with open("output/res.csv", "w") as f:
         f.write(header + "\n")
     outdir = Path("./output/")
+    failed: dict[str, int] = {}
     for ds, k in product(datasets, ks):
         basedir = datadir.joinpath(f"{ds}_{k}")
         for instance in os.listdir(basedir):
             file = basedir.joinpath(instance)
             for solver in solvers:
+                if k > failed.get(instance, 100):
+                    break
                 respath = outdir.joinpath("solutions", f"{solver}-k{k}-{instance}")
                 frontierpath = outdir.joinpath(
                     "frontiers", f"{solver}-k{k}-{instance[:-4]}.csv"
                 )
                 hasSol = run_instance(file, respath, frontierpath, solver)
                 if solver == 'combine' and (not hasSol):
+                    failed[instance] = k
                     break
 
 
