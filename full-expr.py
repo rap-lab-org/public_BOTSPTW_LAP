@@ -68,9 +68,10 @@ def main():
                     "frontiers", f"{solver}-k{k}-{instance[:-4]}.csv"
                 )
                 hasSol = run_instance(file, respath, frontierpath, solver)
-                if solver == 'combine' and (not hasSol):
+                if not hasSol:
                     failed[instance] = k
-                    break
+                    if solver == 'combine':
+                        break
 
 
 if __name__ == "__main__":
