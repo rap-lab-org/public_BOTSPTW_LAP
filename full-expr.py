@@ -22,10 +22,10 @@ def run_instance(file: Path, respath: Path, frontierpath: Path, solver: str) -> 
 
 def main():
     datasets = [
-            # "AFG",
-            # "Dumas", 
+            "AFG",
+            "Dumas", 
             "OhlmannThomas",
-            # "SolomonPotvinBengio"
+            "SolomonPotvinBengio"
     ]
     ks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     datadir = Path("./mo-data")
