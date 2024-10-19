@@ -2,6 +2,7 @@ import sys
 import random
 def transform_file(input_filename, output_filename, load):
     random.seed(0)
+    INF = 99999
     with open(input_filename, 'r') as fin, open(output_filename, 'w') as fout:
         lines = fin.readlines()
         n = int(lines[0])
@@ -19,10 +20,10 @@ def transform_file(input_filename, output_filename, load):
         # for i in range(n * 3 + 1, n * 4 + 1):
         #     fout.write(lines[i])
         # fout.write("0\n")
-        fout.write(lines[1].strip() + " 999\n")
+        fout.write(lines[1].strip() + f" {INF}\n")
         for i in range(2, n + 1):
             fout.write(lines[i].strip() + " " + lines[i].split()[0] + "\n")
-        fout.write("999 " * n + "0\n" )
+        fout.write(f"{INF} " * n + "0\n" )
         for i in range(n + 1, n * 2 + 1):
             fout.write(lines[i])
         fout.write(lines[n + 1])

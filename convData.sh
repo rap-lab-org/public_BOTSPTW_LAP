@@ -21,6 +21,8 @@ conv_data() {
 dataset=(
 	"./data/Dumas"
 	"./data/SolomonPotvinBengio"
+	"./data/AFG"
+	"./data/OhlmannThomas"
 )
 
 newdir="./mo-data"
