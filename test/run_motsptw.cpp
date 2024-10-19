@@ -77,8 +77,11 @@ int main(int argc, char* argv[]) {
 		// remove suffix ".txt"
 		auto spos = fn.find_last_of('/')+1;
 		auto kpos = fn.find_first_of('_')+1;
+		auto dpos = fn.find_last_of('/', kpos)+1;
+		auto sufpos = fn.find_last_of('.');
 		std::string kstr = fn.substr(kpos, fn.find('/', kpos)-kpos);
-		std::string insname = fn.substr(spos, fn.length()-4-spos);
+		std::string insname = fn.substr(spos, sufpos-spos);
+		std::string dataset = fn.substr(dpos, kpos-dpos-1);
     rzq::basic::DataLoader dl(fn);
     dl.Load();
     dl.CreateGraph(g);
@@ -107,9 +110,10 @@ int main(int argc, char* argv[]) {
 		std::ofstream fout;
 		fout.open("output/res.csv", std::ios_base::app);
 
-		row << insname << ","   
-				<< solver << ","
+		row << dataset << ","
+				<< insname << ","
 				<< kstr << ","
+				<< solver << ","   
 				<< std::setprecision(4) << res.runtime << "," 
 				<< res.timeout << "," 
 				<< res.paths.size() << "," 

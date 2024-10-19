@@ -36,9 +36,10 @@ def main():
             "default", 
     ]
     cols = [
+        "dataset",
         "name",
-        "solver",
         "k",
+        "solver",
         "time",
         "timeout",
         "numsol",
