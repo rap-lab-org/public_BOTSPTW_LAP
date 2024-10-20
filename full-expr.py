@@ -5,6 +5,12 @@ import subprocess
 from pathlib import Path
 
 
+def normal_fn(fn: str) -> str:
+    if fn.endswith('.txt') or fn.endswith('.tw'):
+        return fn.removesuffix('.' + fn.split('.')[-1])
+    else:
+        return fn
+
 def run_instance(file: Path, respath: Path, frontierpath: Path, solver: str) -> bool:
     cmd = ["./build/run_motsptw", str(file), solver]
     print(f">> {' '.join(cmd)}")
@@ -22,19 +28,19 @@ def run_instance(file: Path, respath: Path, frontierpath: Path, solver: str) -> 
 
 def main():
     datasets = [
-            "AFG",
-            "Dumas", 
-            # "OhlmannThomas",
-            "SolomonPotvinBengio",
-            "SolomonPesant",
+        "AFG",
+        "Dumas",
+        # "OhlmannThomas",
+        "SolomonPotvinBengio",
+        "SolomonPesant",
     ]
     ks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     datadir = Path("./mo-data")
     solvers = [
-            "combine",
-            "gap_prune", 
-            "fastdom", 
-            "default", 
+        "combine",
+        "gap_prune",
+        "fastdom",
+        "default",
     ]
     cols = [
         "dataset",
@@ -68,13 +74,14 @@ def main():
                 if k > failed.get((instance, solver), 100):
                     break
                 respath = outdir.joinpath("solutions", f"{solver}-k{k}-{instance}")
+                instname = normal_fn(instance)
                 frontierpath = outdir.joinpath(
-                    "frontiers", f"{solver}-k{k}-{instance[:-4]}.csv"
+                    "frontiers", f"{solver}-k{k}-{instname}.csv"
                 )
                 hasSol = run_instance(file, respath, frontierpath, solver)
                 if not hasSol:
                     failed[(instance, solver)] = k
-                    if solver == 'combine':
+                    if solver == "combine":
                         break
 
 
