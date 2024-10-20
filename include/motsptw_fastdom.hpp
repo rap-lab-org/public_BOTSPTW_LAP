@@ -232,22 +232,12 @@ protected:
 		}
 
 		inline bool _GapVertCheck(const Label& l, long j) {
-			// for (const auto& k: gap_verts[l.v][j]) {
-			// 	if (l.b.get(k)) continue;
-			// 	const auto& curt = l.g[1];
-			// 	const auto& dvk = _graph->at(l.v).at(k);
-			// 	const auto& dkj = _graph->at(k).at(j);
-			// 	if (std::max(curt + dvk, _tw[k].first) + dkj <= _tw[j].first) return true;
-			// }
-			for (int k=0; k<_graph->size(); k++) if (k != l.v && k != j && l.b.get(k) == false)
-			{
-					const auto& curt = l.g[1];
-					const auto& dvk = _graph->at(l.v).at(k);
-					const auto& dkj = _graph->at(k).at(j);
-					const auto& dvj = _graph->at(l.v).at(j);
-					auto tatj = std::max(curt+dvj, _tw[j].first);
-					auto tatk = std::max(curt+dvk, _tw[k].first);
-					if (tatk + dkj <= tatj) return true;
+			for (const auto& k: gap_verts[l.v][j]) {
+				if (l.b.get(k)) continue;
+				const auto& curt = l.g[1];
+				const auto& dvk = _graph->at(l.v).at(k);
+				const auto& dkj = _graph->at(k).at(j);
+				if (std::max(curt + dvk, _tw[k].first) + dkj <= _tw[j].first) return true;
 			}
 			return false;
 		}
