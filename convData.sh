@@ -22,6 +22,7 @@ dataset=(
 	"./data/Dumas"
 	"./data/SolomonPotvinBengio"
 	"./data/AFG"
+	"./data/SolomonPesant"
 	# "./data/OhlmannThomas"
 )
 
