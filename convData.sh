@@ -22,7 +22,7 @@ dataset=(
 	"./data/Dumas"
 	"./data/SolomonPotvinBengio"
 	"./data/AFG"
-	"./data/OhlmannThomas"
+	# "./data/OhlmannThomas"
 )
 
 newdir="./mo-data"
