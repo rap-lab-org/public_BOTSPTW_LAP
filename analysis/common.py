@@ -1,5 +1,7 @@
 import numpy as np
+import os
 from itertools import product
+import pandas as pd
 
 def normal_fn(fn: str) -> str:
     if fn.endswith('.txt') or fn.endswith('.tw'):
@@ -41,6 +43,28 @@ def get_bestknown(dataset: str, instname: str) -> float:
     return res
 
 
+def get_best_makespan_sol(solfile: str) -> float:
+    if os.path.exists(solfile):
+        with open(solfile, 'r') as f:
+            penalty, makespan = map(float, f.readline().strip().split())
+            return makespan
+    return np.inf
+
+
+def get_frontier_avg(labelfile: str) -> float:
+    if os.path.exists(labelfile):
+        df = pd.read_csv(labelfile)
+        return float(df['labels'].mean())
+    return np.inf
+
+
+def get_NDs_avg(labelfile: str) -> float:
+    if os.path.exists(labelfile):
+        df = pd.read_csv(labelfile)
+        return float(df['NDs'].mean())
+    return np.inf
+
+
 class Instance:
     tw: list[tuple[float, float]]
     key_nodes: list[int]
@@ -74,30 +98,33 @@ class Instance:
         return dict(
             instname=self.instname,
             dataset=self.dataset,
-            otw=self.median_overlap(),
-            ltw=self.median_tw(),
-            mcost=self.median_cost(),
+            otw=self.mean_overlap(),
+            ltw=self.mean_tw(),
+            mcost=self.mean_cost(),
+            n=len(self.cost),
             bestknown=self.bestknown,
         )
 
-    def median_cost(self):
+    def mean_cost(self):
         costs: list[float] = []
         for c in self.cost:
             costs += c
-        return np.median(costs)
+        return np.mean(costs)
 
-    def median_tw(self):
+    def mean_tw(self):
         lens: list[float] = []
         for l, r in self.tw:
             lens.append(r - l)
-        return np.median(lens)
+        return np.mean(lens)
 
-    def median_overlap(self):
+    def mean_overlap(self):
         n = len(self.cost)
         otw: list[float] = []
         for i, j in product(range(n), range(n)):
+            if i <= j:
+                continue
             li, ri = self.tw[i]
             lj, rj = self.tw[j]
             overlap = max(min(ri, rj) - max(li, lj), 0)
             otw.append(overlap)
-        return np.median(otw)
+        return np.mean(otw)
