@@ -46,3 +46,5 @@ build/
 *.log
 **/.launch.json
 mo-data/*
+*.png
+**/.DS_Store
