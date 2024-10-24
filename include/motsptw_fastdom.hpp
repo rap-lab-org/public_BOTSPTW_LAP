@@ -133,6 +133,7 @@ public:
 		}
     std::unordered_set<long> _key_nodes;
 		bool use_gap_prune = false;
+		bool use_heur = false;
 
 		bool isValid(const std::vector<long>& path, const CostVec& cost); 
 
@@ -243,7 +244,7 @@ protected:
 		}
 };
 
-int RunMOTSPTW(Grid* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, bool use_gap_prune, double tlimit=300);
+int RunMOTSPTW(Grid* g, TimeWindowVec tw, std::vector<double> st, long vo, long vd, std::set<long> keys, MOTSPTWResult* res, bool use_gap_prune, bool use_heur, double tlimit=300);
 
 
 }

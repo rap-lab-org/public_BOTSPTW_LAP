@@ -279,7 +279,7 @@ double MOTSPTW::_HeurPenalty(const Label& l) const {
 
 CostVec MOTSPTW::_Heuristic(const Label& l) const {
   auto out = CostVec(DIM, 0);
-	// out[0] = _HeurPenalty(l);
+	if (use_heur) out[0] = _HeurPenalty(l);
   // out[1] = _HeurArrivalTime(l);
   return out;
 };
@@ -653,7 +653,7 @@ bool MOTSPTW::isValid(const std::vector<long>& path,
 
 int RunMOTSPTW(Grid* g, TimeWindowVec tw,
                std::vector<double> st, long vo, long vd, std::set<long> keys,
-               MOTSPTWResult *res, bool use_gap_prune, double tlimit) {
+               MOTSPTWResult *res, bool use_gap_prune, bool use_heur, double tlimit) {
   int ret_flag = 0;
   auto planner = MOTSPTW();
   planner.SetGraphPtr(g);
@@ -663,6 +663,7 @@ int RunMOTSPTW(Grid* g, TimeWindowVec tw,
   planner._key_nodes = std::unordered_set<long>(keys.begin(), keys.end());
   // planner.InitHeu(vd);
 	planner.use_gap_prune = use_gap_prune;
+	planner.use_heur = use_heur;
   ret_flag = planner.Search(vo, vd);
   *res = planner.GetResult();
 	if (!planner.isValidAll()) {
