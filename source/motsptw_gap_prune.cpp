@@ -517,14 +517,14 @@ int MOTSPTW::Search(long vo, long vd) {
           continue;
         }
 				l2.g[1] += _service_time[l2.v];
-        if (_FrontierCheck(l2)) {
-          _res.frontier_pruned++;
-          continue;
-        }
-        if (_SolutionCheck(l2)) {
-          _res.sol_pruned++;
-          continue;
-        }
+        // if (_FrontierCheck(l2)) {
+        //   _res.frontier_pruned++;
+        //   continue;
+        // }
+        // if (_SolutionCheck(l2)) {
+        //   _res.sol_pruned++;
+        //   continue;
+        // }
         // if (_PostCheck_N(l2, 2)) {
         //   _res.post2_pruned++;
         //   continue;
