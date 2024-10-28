@@ -2,6 +2,7 @@ import numpy as np
 import os
 from itertools import product
 import pandas as pd
+from collections import defaultdict
 
 def normal_fn(fn: str) -> str:
     if fn.endswith('.txt') or fn.endswith('.tw'):
@@ -65,6 +66,28 @@ def get_NDs_avg(labelfile: str) -> float:
     return np.inf
 
 
+def get_middles(cost: list[list[float]], tw: list[tuple[float, float]]) -> dict[tuple[int, int], list[int]]:
+    # res[i][j] = [m1, m2, .. mi]
+    # i->m->j dominates i->j
+    n = len(cost)
+    res: dict[tuple[int, int], list[int]] = defaultdict(list)
+    for i, j in product(range(n), range(n)):
+        if i == j:
+            continue
+        li, ri = tw[i]
+        lj, rj = tw[j]
+        for m in range(n):
+            if m == i or m == j:
+                continue
+            lm, rm = tw[m]
+            dim = cost[i][m]
+            dmj = cost[m][j]
+            arrive_m_t = max(li + dim, lm)
+            if (arrive_m_t + dmj <= rj):
+                res[(i, j)].append(m)
+    return res
+
+
 class Instance:
     tw: list[tuple[float, float]]
     key_nodes: list[int]
@@ -98,12 +121,18 @@ class Instance:
         return dict(
             instname=self.instname,
             dataset=self.dataset,
+            ldist=self.mean_ldist(),
             otw=self.mean_overlap(),
             ltw=self.mean_tw(),
+            # msize=self.msize() / len(self.cost),
             mcost=self.mean_cost(),
             n=len(self.cost),
             bestknown=self.bestknown,
         )
+
+    def msize(self):
+        ms = get_middles(self.cost, self.tw)
+        return len(ms.keys())
 
     def mean_cost(self):
         costs: list[float] = []
@@ -116,6 +145,19 @@ class Instance:
         for l, r in self.tw:
             lens.append(r - l)
         return np.mean(lens)
+
+    def mean_ldist(self):
+        n = len(self.cost)
+        dist: list[float] = []
+        for i, j in product(range(n), range(n)):
+            if i == j:
+                continue
+            li, ri = self.tw[i]
+            lj, rj = self.tw[j]
+            ldist = lj - li
+            if ldist > 0:
+                dist.append(ldist)
+        return np.mean(dist)
 
     def mean_overlap(self):
         n = len(self.cost)
