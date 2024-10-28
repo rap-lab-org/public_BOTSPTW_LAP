@@ -550,7 +550,7 @@ int MOTSPTW::Search(long vo, long vd) {
         if (_key_nodes.find(u) != _key_nodes.end()) {
           // update 2nd objective
           // if the u is a key node, then apply penalty on 'later finish'
-          gu[0] += gu[1] - _tw[u].first;
+          gu[0] += gu[1] - _tw[u].first + 1;
         }
         // gu[1] += _service_time[l.v];
         BinaryServiceSet bu(l.b);
