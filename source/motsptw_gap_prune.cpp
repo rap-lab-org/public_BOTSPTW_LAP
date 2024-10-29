@@ -573,7 +573,7 @@ bool MOTSPTW::isValid(const std::vector<long>& path,
 			return false;
 		}
 		if (_key_nodes.count(curv)) {
-			panelty += curt - _tw[curv].first;
+			panelty += curt - _tw[curv].first + 1;
 		}
 		vis.insert(curv);
 	}
