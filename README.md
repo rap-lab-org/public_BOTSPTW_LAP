@@ -51,3 +51,14 @@ One can also run the following scripts to reproduce all experiments mentioned in
 ```bash
 python full-expr.py
 ```
+### Cite
+```bibtex
+@inproceedings{zhao2025botsptwvp,
+  title={Bi-Objective Search for the Traveling Salesman Problem with Time Windows and Vacant Penalties},
+  author={Zhao, Shizhe and Wu, Yancheng and Ren, Zhongqiang},
+  booktitle={Proceedings of the International Symposium on Combinatorial Search},
+  volume={18},
+  pages={171--179},
+  year={2025}
+}
+```
