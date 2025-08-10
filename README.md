@@ -1,13 +1,6 @@
-# MO-TSPTW
+# Bi-Objective Search for TSPTW-VP
 
 ## How to use
-
-### Clone the repository
-
-```bash
-git clone https://github.com/eggeek/mo-tsptw.git
-cd mo-tsptw
-```
 
 ### Generate dataset
 
@@ -21,7 +14,14 @@ You can also refer to [this link](https://lopez-ibanez.eu/tsptw-instances) for s
 
 ### Convert the dataset
 
-In our problem, we also define some `key nodes` with the total waiting time should also be minimized. You can generate the dataset by running the following command:
+- TL;DR: 
+    ```bash
+    ./convData.sh
+    ```
+The script above will read `TSPTW` instances from `data/` and generate `TSPTW-VP` instances in `mo-data/`.
+
+Specifically, in our problem, we also define some `key nodes` with the total waiting time should also be minimized. 
+You can generate the dataset by running the following command:
 
 ```bash
 python3 ./python/convertTestData.py <input_file> <output_file> <load>
@@ -31,20 +31,23 @@ where `<input_file>` is the path to the TSPTW data, `<output_file>` is the path 
 
 You can also manually change the number of key nodes and choose the key nodes by modifying the generated file.
 
-### Compile the code
+### Compile and Run
 
 ```bash
-mkdir build
-cd build
-cmake ..
-make
+make fast
 ```
 
-### Run the code
+This will compile the executable `build/run_motsptw`, then you can run the code as follows
 
 ```bash
-./run_motsptw <data>
+./build/run_motsptw <data>
+# e.g.,
+# ./build/run_motsptw ./mo-data/Dumas_10/n20w20.001.txt
 ```
+where `<data>` is the path to the TSPTW-VP data.
 
-where `<data>` is the path to the MO-TSPTW data.
+One can also run the following scripts to reproduce all experiments mentioned in the paper:
 
+```bash
+python full-expr.py
+```
